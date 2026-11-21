@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WOLF MASS · 12-WEEK HYBRID BLOCK // YARO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Big+Shoulders+Display:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --slate:#1B2220; --slate-2:#222B28; --slate-3:#2B3532; --line:#38433F;
+  --chalk:#ECE8DF; --dust:#A3ABA6; --faint:#6E7873;
+  --p-entry:#DAD6CC; --p-block1:#3E73C4; --p-peak:#D2483A; --p-deload:#3E9A62; --p-block2:#E2B23A;
+  --accent:var(--p-block1);
+  --display:'Big Shoulders Display',Impact,sans-serif;
+  --text:'Atkinson Hyperlegible',system-ui,sans-serif;
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--slate);color:var(--chalk);font-family:var(--text);font-size:16px;line-height:1.5;min-height:100vh;
+  background-image:radial-gradient(ellipse 80% 50% at 20% 0%,rgba(236,232,223,.045),transparent 70%);background-attachment:fixed}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.wrap{max-width:980px;margin:0 auto;padding:20px 20px 120px}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-bottom:18px}
+.mark{font-family:var(--display);font-weight:900;font-size:24px;letter-spacing:.02em}
+.mark span{color:var(--accent)}
+.today-date{color:var(--dust);font-size:14px}
+
+/* hero: the barbell */
+.hero{padding:10px 0 26px}
+.hero h1{font-family:var(--display);font-weight:900;font-size:clamp(56px,13vw,118px);line-height:.86;letter-spacing:-.005em}
+.hero h1 .of{color:var(--faint)}
+.hero .phase{font-size:17px;color:var(--dust);margin-top:10px;max-width:62ch}
+.hero .phase b{color:var(--chalk)}
+.bar-wrap{margin-top:22px;overflow-x:auto;scrollbar-width:none}
+.bar-wrap::-webkit-scrollbar{display:none}
+svg.bar{display:block;width:100%;height:auto}
+svg.bar .plate{cursor:pointer;transition:transform .25s ease}
+svg.bar .plate:hover{transform:translateY(-4px)}
+svg.bar .plate:focus{outline:none}
+svg.bar .plate:focus-visible rect.p{stroke:var(--chalk);stroke-width:2}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px;font-size:13px;color:var(--dust)}
+.legend i{display:inline-block;width:10px;height:18px;border-radius:2px;margin-right:7px;vertical-align:-4px}
+.philo{margin-top:20px;font-size:15px;color:var(--dust);max-width:62ch}
+.philo strong{color:var(--chalk);font-weight:700}
+
+/* numbers row */
+.nums{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:4px 0 30px}
+.num{padding:16px 14px 14px;border-left:1px solid var(--line)}
+.num:first-child{border-left:none;padding-left:0}
+.num .v{font-family:var(--display);font-weight:800;font-size:38px;line-height:1;font-variant-numeric:tabular-nums}
+.num .l{font-size:13px;color:var(--dust);margin-top:6px}
+.num .t{font-size:12.5px;color:var(--faint)}
+@media(max-width:640px){.nums{grid-template-columns:1fr 1fr}.num:nth-child(3){border-left:none;padding-left:0}.num:nth-child(n+3){border-top:1px solid var(--line)}}
+
+/* nav */
+nav.tabs{display:flex;gap:4px;margin-bottom:26px;position:sticky;top:0;z-index:10;background:var(--slate);padding:10px 0;border-bottom:1px solid var(--line)}
+nav.tabs button{font:700 15px var(--text);color:var(--dust);background:none;border:none;padding:10px 14px;border-radius:999px;cursor:pointer}
+nav.tabs button:hover{color:var(--chalk)}
+nav.tabs button[aria-selected=true]{background:var(--chalk);color:var(--slate)}
+@media(max-width:700px){
+  nav.tabs{position:fixed;bottom:0;left:0;right:0;top:auto;margin:0;border-top:1px solid var(--line);border-bottom:none;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(27,34,32,.96);backdrop-filter:blur(8px);overflow-x:auto;scrollbar-width:none}
+  nav.tabs::-webkit-scrollbar{display:none}
+  nav.tabs button{font-size:14px;padding:10px 12px;flex:0 0 auto}
+  nav.tabs .more-only{display:none}
+}
+.pane{display:none}.pane.on{display:block}
+
+/* type */
+h2{font-family:var(--display);font-weight:800;font-size:40px;line-height:.95;letter-spacing:.005em}
+h3{font-family:var(--display);font-weight:700;font-size:26px;line-height:1;letter-spacing:.01em}
+.lead{color:var(--dust);margin-top:8px;max-width:64ch}
+.small{font-size:13.5px;color:var(--dust)}
+.sec{margin-top:40px}
+.sec:first-child{margin-top:0}
+p+p{margin-top:8px}
+
+/* today */
+.day-strip{display:flex;gap:6px;margin:18px 0 4px;overflow-x:auto;scrollbar-width:none}
+.day-strip::-webkit-scrollbar{display:none}
+.day-strip button{flex:0 0 auto;min-width:58px;padding:8px 10px 9px;border-radius:var(--r);background:var(--slate-2);border:1px solid var(--line);color:var(--dust);cursor:pointer;font:400 13px var(--text);text-align:left}
+.day-strip button b{display:block;font:800 22px var(--display);color:var(--chalk);line-height:1}
+.day-strip button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--slate)}
+.day-strip button[aria-pressed=true] b{color:var(--slate)}
+.day-strip button .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--faint);margin-left:4px;vertical-align:1px}
+.day-strip button .dot.done{background:var(--p-deload)}
+.sess-title{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-top:22px}
+.sess-title h2{font-size:clamp(44px,9vw,72px)}
+.sess-title .sub{color:var(--dust);font-size:15px;margin-top:8px}
+.wk-select{background:var(--slate-2);color:var(--chalk);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;font:400 15px var(--text)}
+.callout{margin:18px 0;padding:14px 16px;border-radius:var(--r);background:var(--slate-2);border-left:4px solid var(--accent);color:var(--chalk);font-size:15px;max-width:72ch}
+.callout.warn{border-left-color:var(--p-peak)}
+.callout.good{border-left-color:var(--p-deload)}
+.callout strong{display:block;font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:.01em;margin-bottom:2px}
+
+.ex{padding:18px 0;border-top:1px solid var(--line)}
+.ex:last-of-type{border-bottom:1px solid var(--line)}
+.ex-top{display:grid;grid-template-columns:1fr auto;gap:4px 16px;align-items:baseline}
+.ex-n{font-weight:700;font-size:18px}
+.ex-rx{font-family:var(--display);font-weight:700;font-size:24px;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.ex-rx small{font-family:var(--text);font-weight:400;font-size:13px;color:var(--dust);margin-left:6px}
+.ex-note{grid-column:1/-1;color:var(--dust);font-size:14.5px}
+.ex-hint{grid-column:1/-1;font-size:14px;margin-top:2px;color:var(--p-deload)}
+.ex-hint.hold{color:var(--p-block2)}
+.sets{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.set{display:flex;align-items:center;gap:4px;background:var(--slate-2);border:1px solid var(--line);border-radius:var(--r);padding:4px 6px 4px 10px}
+.set .i{font:700 14px var(--display);color:var(--faint);width:12px}
+.set input{width:58px;height:40px;background:transparent;border:none;color:var(--chalk);font:700 20px var(--display);text-align:center;font-variant-numeric:tabular-nums}
+.set input::placeholder{color:var(--faint);font:400 13px var(--text)}
+.set .x{color:var(--faint)}
+.set input:focus{outline:none;background:var(--slate-3);border-radius:6px}
+.set.wide input{width:min(320px,70vw);text-align:left;font:400 15px var(--text)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+textarea,input.f,select.f{background:var(--slate-2);color:var(--chalk);border:1px solid var(--line);border-radius:var(--r);padding:11px 12px;font:400 15px var(--text)}
+textarea{width:100%;resize:vertical}
+input.f{width:110px}
+label.f{display:block;font-size:13px;color:var(--dust);margin-bottom:5px}
+.check{display:flex;gap:8px;align-items:center;font-size:15px;color:var(--chalk);cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--accent)}
+.btn{font:700 15px var(--text);border-radius:999px;padding:12px 20px;cursor:pointer;border:1px solid var(--chalk);background:var(--chalk);color:var(--slate)}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent;color:var(--chalk);border-color:var(--line)}
+.btn.danger{background:transparent;color:var(--p-peak);border-color:var(--p-peak)}
+
+/* plan */
+.weeks{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:18px}
+.wk{background:var(--slate);padding:14px 16px 16px;cursor:pointer;position:relative;border:none;color:inherit;text-align:left;font:inherit}
+.wk:hover{background:var(--slate-2)}
+.wk .stripe{position:absolute;left:0;top:0;bottom:0;width:4px}
+.wk .n{font:900 30px var(--display);line-height:1}
+.wk .d{font-size:13px;color:var(--faint)}
+.wk .p{font-size:13.5px;font-weight:700;margin-top:8px}
+.wk .c{font-size:14px;color:var(--dust);margin-top:4px}
+.wk.now{background:var(--slate-2)}
+.wk.now .n::after{content:'now';font:700 12px var(--text);color:var(--slate);background:var(--accent);padding:2px 7px;border-radius:999px;margin-left:8px;vertical-align:6px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{font-weight:400;font-size:13px;color:var(--dust);text-align:left;padding:8px 10px 8px 0;border-bottom:1px solid var(--line)}
+td{padding:11px 10px 11px 0;border-bottom:1px solid var(--line);vertical-align:top}
+td.n{font-family:var(--display);font-weight:700;font-size:19px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.scroll{overflow-x:auto}
+.vol{margin-top:16px}
+.vrow{display:grid;grid-template-columns:minmax(120px,190px) 1fr 34px;gap:12px;align-items:center;padding:7px 0}
+.vrow .l{font-size:15px}
+.vrow .t{height:14px;position:relative;background:var(--slate-2);border-radius:3px}
+.vrow .z{position:absolute;top:-4px;bottom:-4px;border-left:1px dashed var(--dust);border-right:1px dashed var(--dust)}
+.vrow .f{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--accent)}
+.vrow .v{font:800 20px var(--display);text-align:right}
+.ev .tag{font-size:12.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--dust);white-space:nowrap}
+.ev .tag.strong{border-color:var(--p-deload);color:var(--p-deload)}
+
+/* body + engine */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.big{font-family:var(--display);font-weight:900;font-size:64px;line-height:.9;font-variant-numeric:tabular-nums}
+.big small{font:400 15px var(--text);color:var(--dust);margin-left:6px}
+.pill{display:inline-block;font-weight:700;font-size:14px;padding:5px 12px;border-radius:999px;background:var(--slate-3);margin-top:10px}
+.pill.up{background:var(--p-block2);color:var(--slate)}.pill.down{background:var(--p-peak);color:var(--chalk)}.pill.hold{background:var(--p-deload);color:var(--slate)}
+svg.chart{width:100%;height:auto;display:block;margin-top:14px}
+.gate{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+@media(max-width:600px){.gate{grid-template-columns:1fr}}
+.gate div{padding:14px;border-radius:var(--r);background:var(--slate-2);font-size:15px;border:1px solid var(--line)}
+.gate div.hit{border-color:var(--p-peak);color:var(--chalk);background:rgba(210,72,58,.12)}
+.gate div b{display:block;font:800 22px var(--display)}
+.verdict{font:900 44px var(--display);margin-top:18px;line-height:1}
+ul.rules{list-style:none;margin-top:10px}
+ul.rules li{padding:10px 0;border-top:1px solid var(--line);font-size:15.5px;max-width:70ch}
+.rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 36px}
+@media(max-width:760px){.rules-grid{grid-template-columns:1fr}}
+.rule-block h3{display:flex;align-items:center;gap:10px}
+.rule-block h3 i{width:8px;height:22px;border-radius:2px;display:inline-block}
+
+.toast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,10px);background:var(--chalk);color:var(--slate);font-weight:700;padding:11px 18px;border-radius:999px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:30}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+footer{margin-top:60px;color:var(--faint);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="mark">Wolf <span>Mass</span></div>
+  <div class="today-date" id="todayDate"></div>
+</header>
+
+<section class="hero" aria-labelledby="heroTitle">
+  <h1 id="heroTitle"></h1>
+  <p class="phase" id="heroPhase"></p>
+  <div class="bar-wrap"><svg class="bar" id="bar" viewBox="0 0 960 190" role="group" aria-label="Twelve weeks as plates on a bar"></svg></div>
+  <div class="legend" id="legend"></div>
+  <p class="philo"><strong>Strength and hypertrophy first</strong>, HYROX conditioning second, running rehabilitation third. 85 kg to 87–88.5 kg by 14 February, then on to 90.</p>
+</section>
+
+<section class="nums" id="nums" aria-label="Key numbers"></section>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" aria-selected="true" data-p="today">Today</button>
+  <button role="tab" aria-selected="false" data-p="plan">Plan</button>
+  <button role="tab" aria-selected="false" data-p="body">Body</button>
+  <button role="tab" aria-selected="false" data-p="engine">Engine</button>
+  <button role="tab" aria-selected="false" data-p="fuel">Fuel</button>
+  <button role="tab" aria-selected="false" data-p="rules">Rules</button>
+  <button role="tab" aria-selected="false" data-p="data">Data</button>
+</nav>
+
+<!-- TODAY -->
+<section class="pane on" id="p-today">
+  <div class="row" style="justify-content:space-between">
+    <div class="small" id="t-date"></div>
+    <select class="wk-select" id="t-week" aria-label="Week"></select>
+  </div>
+  <div class="day-strip" id="t-days" aria-label="Day of week"></div>
+  <div class="sess-title"><div><h2 id="t-title"></h2><div class="sub" id="t-meta"></div></div></div>
+  <div id="t-body"></div>
+</section>
+
+<!-- PLAN -->
+<section class="pane" id="p-plan">
+  <div class="sec">
+    <h2>Twelve weeks</h2>
+    <p class="lead">Tap a week to open its sessions.</p>
+    <div class="weeks" id="weeks"></div>
+  </div>
+  <div class="sec">
+    <h2>The week</h2>
+    <div class="scroll"><table id="layout" style="margin-top:14px"></table></div>
+  </div>
+  <div class="sec">
+    <h2>Sets per muscle</h2>
+    <p class="lead">Direct sets per week from W3. The dashed zone is where growth evidence sits, around 10 to 14 sets; presses and pulls add about half a set for every set on top.</p>
+    <div class="vol" id="vol"></div>
+  </div>
+  <div class="sec ev">
+    <h2>Why these exercises</h2>
+    <p class="lead">Full range with a controlled stretch at the bottom. Weekly sets and closeness to failure matter more than the exact exercise.</p>
+    <div class="scroll"><table style="margin-top:14px">
+      <tr><th>Muscle</th><th>Main</th><th>Support</th><th>Evidence</th></tr>
+      <tr><td>Triceps</td><td>Overhead cable extension</td><td>Dips, presses</td><td><span class="tag strong">Strong</span> 1.4–1.5× the growth of pushdowns (Maeo 2023)</td></tr>
+      <tr><td>Biceps</td><td>Incline DB curl</td><td>EZ preacher curl</td><td><span class="tag strong">Strong</span> incline grows the shoulder end, preacher the elbow end (Nunes 2025)</td></tr>
+      <tr><td>Brachialis</td><td>Hammer curl</td><td></td><td><span class="tag">Practice</span></td></tr>
+      <tr><td>Side delts</td><td>Lateral raise, DB or cable</td><td></td><td><span class="tag strong">Strong</span> equal growth either way (Larsen 2025)</td></tr>
+      <tr><td>Rear delts</td><td>Reverse pec deck</td><td>Rows</td><td><span class="tag">Practice</span></td></tr>
+      <tr><td>Lats</td><td>Weighted pull-up, neutral pulldown</td><td>One-arm DB row</td><td><span class="tag">Moderate</span> grip width changes little</td></tr>
+      <tr><td>Mid back</td><td>Chest-supported row</td><td>One-arm DB row</td><td><span class="tag">Practice</span> spine stays unloaded</td></tr>
+      <tr><td>Upper chest</td><td>Incline DB press 30°</td><td>Low-to-high cable fly</td><td><span class="tag">EMG</span> incline loads the clavicular head</td></tr>
+      <tr><td>Mid chest</td><td>Bench press</td><td>Cable fly, pec deck</td><td><span class="tag">Moderate</span> press and fly grow it equally</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- BODY -->
+<section class="pane" id="p-body">
+  <div class="grid2">
+    <div>
+      <h2>Morning check-in</h2>
+      <p class="lead">After the toilet, before food. Thirty seconds.</p>
+      <div class="row" style="margin-top:16px">
+        <div><label class="f" for="b-date">Date</label><input class="f" style="width:160px" type="date" id="b-date"></div>
+        <div><label class="f" for="b-w">Weight, kg</label><input class="f" type="number" step="0.1" inputmode="decimal" id="b-w"></div>
+        <div><label class="f" for="b-waist">Waist, cm</label><input class="f" type="number" step="0.1" inputmode="decimal" id="b-waist"></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div><label class="f" for="b-sleep">Sleep, h</label><input class="f" type="number" step="0.1" inputmode="decimal" id="b-sleep"></div>
+        <div><label class="f" for="b-rhr">Resting HR</label><input class="f" type="number" inputmode="numeric" id="b-rhr"></div>
+        <div><label class="f" for="b-knee">Knee, 0–10</label><input class="f" type="number" min="0" max="10" inputmode="numeric" id="b-knee"></div>
+        <div><label class="f" for="b-en">Energy, 1–5</label><input class="f" type="number" min="1" max="5" inputmode="numeric" id="b-en"></div>
+      </div>
+      <div class="row" style="margin-top:14px;gap:22px">
+        <label class="check"><input type="checkbox" id="b-legs"> Legs still heavy</label>
+        <label class="check"><input type="checkbox" id="b-swell"> Knee swelling or limp</label>
+      </div>
+      <div class="row" style="margin-top:18px"><button class="btn" id="b-save">Save check-in</button></div>
+      <div id="b-flags"></div>
+    </div>
+    <div>
+      <h2>Calories this week</h2>
+      <p class="lead">Decided on Mondays from 7-day averages.</p>
+      <div id="b-cal" style="margin-top:16px"></div>
+    </div>
+  </div>
+  <div class="sec">
+    <h2>Weight against the corridor</h2>
+    <p class="lead">Dots are mornings, the line is the 7-day average, the band is +0.2 to +0.35 kg a week from W3.</p>
+    <svg class="chart" id="chart" viewBox="0 0 900 300" role="img" aria-label="Bodyweight chart"></svg>
+  </div>
+  <div class="sec">
+    <h2>Check-in log</h2>
+    <div class="scroll"><table id="b-table" style="margin-top:12px"></table></div>
+  </div>
+</section>
+
+<!-- ENGINE -->
+<section class="pane" id="p-engine">
+  <h2>Wednesday decision</h2>
+  <p class="lead">From W3 the VO2 intervals happen by default. They drop when two of these three are true today; the arm and delt block stays either way.</p>
+  <div class="gate" id="gate"></div>
+  <div class="verdict" id="verdict"></div>
+  <div class="grid2 sec">
+    <div>
+      <h3>Log a 4 × 4</h3>
+      <p class="small" style="margin-top:6px">Average watts for each interval. One target for all four, spread within 3%.</p>
+      <div class="row" style="margin-top:14px">
+        <div><label class="f" for="e-date">Date</label><input class="f" style="width:160px" type="date" id="e-date"></div>
+        <div><label class="f" for="e-1">1</label><input class="f" style="width:74px" type="number" inputmode="numeric" id="e-1"></div>
+        <div><label class="f" for="e-2">2</label><input class="f" style="width:74px" type="number" inputmode="numeric" id="e-2"></div>
+        <div><label class="f" for="e-3">3</label><input class="f" style="width:74px" type="number" inputmode="numeric" id="e-3"></div>
+        <div><label class="f" for="e-4">4</label><input class="f" style="width:74px" type="number" inputmode="numeric" id="e-4"></div>
+        <div><label class="f" for="e-5">5</label><input class="f" style="width:74px" type="number" inputmode="numeric" id="e-5"></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div><label class="f" for="e-rpe">RPE</label><input class="f" style="width:74px" type="number" step="0.5" id="e-rpe"></div>
+        <div><label class="f" for="e-hr">Peak HR</label><input class="f" style="width:90px" type="number" id="e-hr"></div>
+        <button class="btn" id="e-save">Save intervals</button>
+      </div>
+      <div id="e-verdict"></div>
+    </div>
+    <div>
+      <h3>How it progresses</h3>
+      <ul class="rules">
+        <li>Spread within 3% and RPE 8 or lower: next week add 5–10 W, or a fifth interval.</li>
+        <li>Spread over 3%: keep the same watts.</li>
+        <li>W7 to W11: odd weeks 5 × 4 min, even weeks 3 × 13 × 30 s on, 15 s off.</li>
+        <li>Apple Cardio Fitness only updates from outdoor walks, runs and hikes, so watts are the measure in this block.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="sec"><h2>Interval history</h2><div class="scroll"><table id="e-table" style="margin-top:12px"></table></div></div>
+</section>
+
+<!-- FUEL -->
+<section class="pane" id="p-fuel">
+  <div class="grid2">
+    <div>
+      <h2>Targets</h2>
+      <div class="scroll"><table id="macros" style="margin-top:14px"></table></div>
+      <p class="small" style="margin-top:12px">Creatine monohydrate 5 g every day. At least 170 g protein, 35–45 g a meal.</p>
+    </div>
+    <div>
+      <h2>Adjusting from W3</h2>
+      <ul class="rules">
+        <li>Under 0.15 kg a week for two weeks: add 150 kcal of carbs.</li>
+        <li>0.2 to 0.35 kg a week: hold.</li>
+        <li>Over 0.4 kg a week, or waist up 1 cm in two weeks: take off 150 kcal.</li>
+        <li>W1–W2: if weight holds within 0.3 kg after the creatine water, 3450 is maintenance.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="sec">
+    <h2>A workday</h2>
+    <p class="lead">Training at five.</p>
+    <div class="scroll"><table style="margin-top:14px">
+      <tr><th>Time</th><th>Meal</th><th>Protein</th></tr>
+      <tr><td class="n">6:00</td><td>Oats 120 g in milk, 3 eggs, banana, 5 g creatine</td><td class="n">40 g</td></tr>
+      <tr><td class="n">9:30</td><td>2 slices bread, cheese or ham, Greek yoghurt 200 g</td><td class="n">35 g</td></tr>
+      <tr><td class="n">12:30</td><td>Rice or potato 300 g cooked, chicken or beef 180 g, vegetables, olive oil</td><td class="n">45 g</td></tr>
+      <tr><td class="n">15:45</td><td>Banana or dates, bread with honey, 60–80 g carbs</td><td class="n"></td></tr>
+      <tr><td class="n">17:00</td><td>Water and electrolytes; on Wednesday and Saturday 30–40 g carbs during</td><td class="n"></td></tr>
+      <tr><td class="n">19:00</td><td>Pasta or rice, fish or meat 200 g, vegetables</td><td class="n">45 g</td></tr>
+      <tr><td class="n">21:00</td><td>Cottage cheese 250 g or casein 40 g, nuts 30 g</td><td class="n">40 g</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- RULES -->
+<section class="pane" id="p-rules">
+  <div class="rules-grid">
+    <div class="rule-block sec">
+      <h3><i style="background:var(--p-peak)"></i>Knee</h3>
+      <ul class="rules">
+        <li>Pain rising during BBJ, sleds, lunges or any leg exercise, or the movement changes: that exercise is done for the day.</li>
+        <li>Pain, swelling or a limp the next day: review the week's leg load.</li>
+        <li>Sports physio before any running progression.</li>
+        <li>Running back, after physio: 6 × 200 m, then 400, 600 and 1000 m, with pain at 2/10 or lower during and back to baseline next morning.</li>
+      </ul>
+    </div>
+    <div class="rule-block sec">
+      <h3><i style="background:var(--p-block1)"></i>Illness</h3>
+      <ul class="rules">
+        <li>Fever or symptoms below the neck: full rest until 24 hours without fever; first session back at 3 RIR with half the sets.</li>
+        <li>Nose and throat only, no fever: Engine and Saturday off, lifting at 3 RIR.</li>
+        <li>Calories and protein stay on plan.</li>
+      </ul>
+    </div>
+    <div class="rule-block sec">
+      <h3><i style="background:var(--chalk)"></i>Lifting</h3>
+      <ul class="rules">
+        <li>Legs never to failure. Main lifts 1–2 RIR. Upper-body isolation, last set 0–1 RIR.</li>
+        <li>All sets at the top of the range: next time +2.5 kg, dumbbells +2 kg, isolation one step.</li>
+        <li>The session ends on the written volume.</li>
+        <li>A missed session is skipped. Friday catches a missed Upper B.</li>
+        <li>Elbow pain: one biceps set less a week, preacher curl becomes hammer curl.</li>
+        <li>Back sore the day after sumo squats: the exercise goes.</li>
+      </ul>
+    </div>
+    <div class="rule-block sec">
+      <h3><i style="background:var(--p-deload)"></i>Recovery</h3>
+      <ul class="rules">
+        <li>Bed at 21:30, give or take 30 minutes, every night. 8–9 hours in bed.</li>
+        <li>Caffeine before 13:00. Engine starts before 18:00.</li>
+        <li>Two of these, sleep under 6.5 h, resting HR up 5, HRV low 3 days: cut that day's sets by 30% and keep the loads.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- DATA -->
+<section class="pane" id="p-data">
+  <h2>Your data</h2>
+  <p class="lead">Everything you log stays in this browser on this device. Copy it out once a week and save it to logs/ in the repo so Claude can read it on Sunday.</p>
+  <div class="row" style="margin-top:16px">
+    <button class="btn" id="d-copy">Copy data</button>
+    <button class="btn ghost" id="d-exp">Download JSON</button>
+    <button class="btn ghost" id="d-csv">Download sets CSV</button>
+  </div>
+  <p class="small" style="margin-top:10px">Inside the Claude app downloads are blocked; Copy data works everywhere.</p>
+  <div class="row" style="margin-top:20px">
+    <div style="flex:1;min-width:240px"><label class="f" for="d-paste">Import: paste a copied export</label><textarea id="d-paste" rows="3"></textarea></div>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button class="btn ghost" id="d-pimp">Import pasted data</button>
+    <label class="btn ghost" style="display:inline-block">Import a file<input type="file" id="d-imp" accept=".json" hidden></label>
+    <button class="btn danger" id="d-clr">Clear everything</button>
+  </div>
+  <p class="small" id="d-sum" style="margin-top:16px"></p>
+  <div class="sec">
+    <h2>Lift history</h2>
+    <select class="f" id="d-ex" style="margin-top:14px" aria-label="Exercise"></select>
+    <div class="scroll"><table id="d-hist" style="margin-top:12px"></table></div>
+  </div>
+</section>
+
+<footer>Wolf Mass, built on the wolf-hyrox system for Yaro. Data stays on this device until you copy it out.</footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* storage */
+const mem = {};
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):(mem[k]??d); }catch(e){ return mem[k]??d; } },
+  set(k,v){ mem[k]=v; try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+};
+const K = { log:'wm.log.v1', body:'wm.body.v1', eng:'wm.engine.v1' };
+const $ = id => document.getElementById(id);
+
+/* calendar */
+const START = new Date(2026,10,23), DAY = 864e5;
+const iso = d => { const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4); return z.toISOString().slice(0,10); };
+const parse = s => { const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); };
+const weekOf = d => Math.floor((parse(iso(d))-START)/DAY/7)+1;
+const fmt = d => d.toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+
+const PH = {
+  entry:{name:'Entry',col:'var(--p-entry)',hex:'#DAD6CC'},
+  block1:{name:'Block 1',col:'var(--p-block1)',hex:'#3E73C4'},
+  peak:{name:'Peak',col:'var(--p-peak)',hex:'#D2483A'},
+  deload:{name:'Deload',col:'var(--p-deload)',hex:'#3E9A62'},
+  block2:{name:'Block 2',col:'var(--p-block2)',hex:'#E2B23A'}
+};
+const WEEKS = {
+  1:{ph:'entry',size:.62,p:'Entry, 4 sessions',n:'Everything at 3 RIR, one isolation set fewer. Check today\'s working loads. Measure waist and arms, take photos, book the physio.'},
+  2:{ph:'entry',size:.7,p:'Entry, 4–5 sessions',n:'RIR as written. One BikeErg 4 × 4 test for baseline watts. Calories around 3450 to find maintenance.'},
+  3:{ph:'block1',size:.86,p:'Block 1',n:'Full five-session week. Surplus starts at about 3700 kcal. Wednesday VO2 becomes the default.'},
+  4:{ph:'block1',size:.9,p:'Block 1',n:'One more set of pull-ups on Tuesday and pulldowns on Thursday.'},
+  5:{ph:'peak',size:.95,p:'Block 1 peak',n:'Christmas falls on Friday 25 December, so the spare day is taken; a missed session is skipped.'},
+  6:{ph:'deload',size:.5,p:'Deload, check 1',n:'Half the sets, same loads, 3–4 RIR. Light Saturday B without BBJ. Check sets at 1 RIR. Measurements and photos.'},
+  7:{ph:'block2',size:.92,p:'Block 2',n:'Restart from W5 loads. One more arm set: incline curl on Thursday, overhead extension on Tuesday. Biceps go to 0–1 RIR.'},
+  8:{ph:'block2',size:.96,p:'Block 2',n:'One more set of rows only where recovery is good, meaning reps are climbing and strength holds.'},
+  9:{ph:'block2',size:.98,p:'Block 2',n:'Bench becomes 3 × 6–10 plus one back-off set 10% lighter.'},
+  10:{ph:'block2',size:.98,p:'Block 2',n:'Australia Day on Monday 26 January: Lower moves to Tuesday, Upper A to Wednesday, Engine to Friday.'},
+  11:{ph:'peak',size:1,p:'Block 2 peak',n:'Last upper sets at 0–1 RIR.'},
+  12:{ph:'deload',size:.5,p:'Deload, check 2',n:'Half the sets. Final measurements and photos. Then decide: a second block to 90 kg, or a HYROX build.'}
+};
+
+/* program */
+const S = {
+  lower:{ name:'Lower', tag:'15 sets, 65–70 min', stop:'Legs never go to failure and no sets are added. Heavy lunges happen on Monday only.', knee:true, ex:[
+    {id:'legext',n:'Leg extension',s:2,r:[12,15],rir:'2',t:'iso',note:'Pause one second at the top. It warms the knee up.'},
+    {id:'sleg',n:'Seated leg curl',s:2,r:[8,12],rir:'1–2',t:'iso',note:'Pain behind the knee ends the exercise.'},
+    {id:'lpress',n:'Leg press',s:2,r:[8,12],rir:'2',t:'main',load:'~160 kg',note:'Keep the pelvis pinned to the pad.'},
+    {id:'bss',n:'Bulgarian split squat',s:3,r:[8,10],rir:'2',t:'main',load:'24 + 24 kg',note:'Reps per leg.'},
+    {id:'lunge',n:'Heavy walking lunges',s:4,r:[20,20],unit:'m',rir:'2',t:'main',load:'32 + 32 kg',note:'When grip fades, use straps and keep the load.'},
+    {id:'sumo',n:'Sumo squat, heavy dumbbell',s:2,r:[8,12],rir:'2',t:'main',note:'Go down until just before the pelvis tucks. A sore back next day removes it.'}
+  ]},
+  upperA:{ name:'Upper A', tag:'23 sets, about 75 min with supersets', stop:'Main lifts stop at 1–2 RIR. Upper-body isolation, last set 0–1 RIR.', ex:[
+    {id:'bench',n:'Bench press',s:4,r:[5,8],rir:'1–2',t:'main',load:'80 kg',note:'Mid chest. Lateral raises go between sets.',w9:{s:3,r:[6,10],note:'From W9: 3 × 6–10, then one back-off set 10% lighter.'}},
+    {id:'latA',n:'Lateral raise',s:4,r:[12,20],rir:'0–1',t:'iso',note:'Dumbbells or cable, both grow the delt equally.'},
+    {id:'pullup',n:'Weighted pull-up',s:4,r:[5,8],rir:'1–2',t:'main',load:'+20 kg',inc:{4:1},note:'Clean reps only. Target +25 kg for 6.'},
+    {id:'csrow',n:'Chest-supported row',s:3,r:[8,12],rir:'1–2',t:'main',inc:{8:1},note:'Mid back with the spine unloaded.'},
+    {id:'lthfly',n:'Low-to-high cable fly',s:2,r:[12,15],rir:'1',t:'iso',note:'Upper chest.'},
+    {id:'ezcurl',n:'EZ preacher curl',s:3,r:[8,12],rir:'1',t:'arm',note:'Superset with the overhead extension.'},
+    {id:'ohext',n:'Overhead cable triceps extension',s:3,r:[8,12],rir:'1',t:'iso',inc:{7:1},note:'The main triceps builder.'}
+  ]},
+  engine:{ name:'Engine', tag:'VO2 intervals, then 11 sets for arms, delts and abs', stop:'The VO2 part drops when two of the three Wednesday conditions are true. The block below stays.', vo2:true, ex:[
+    {id:'hammer',n:'Hammer curl',s:3,r:[10,15],rir:'0–1',t:'arm',note:'Brachialis, for arm thickness.'},
+    {id:'latW',n:'Lateral raise',s:3,r:[15,20],rir:'0–1',t:'iso'},
+    {id:'pushd',n:'Cable pushdown',s:2,r:[10,15],rir:'0–1',t:'iso'},
+    {id:'crunch',n:'Cable crunch',s:3,r:[10,15],rir:'1',t:'iso'}
+  ]},
+  upperB:{ name:'Upper B', tag:'21 sets, upper chest first', stop:'Elbow pain: one biceps set less a week, and preacher curl becomes hammer curl.', ex:[
+    {id:'incdb',n:'Incline DB press, 30°',s:4,r:[8,12],rir:'1–2',t:'main',note:'First, while you are fresh. Upper chest.'},
+    {id:'pulldn',n:'Lat pulldown, neutral grip',s:3,r:[8,12],rir:'1',t:'main',inc:{4:1},note:'Full stretch at the top.'},
+    {id:'oarow',n:'One-arm DB row',s:3,r:[8,12],rir:'1–2',t:'main',load:'35 kg',inc:{8:1},note:'Reps per arm. Target 45 kg.'},
+    {id:'cfly',n:'Cable fly or pec deck',s:2,r:[10,15],rir:'1',t:'iso',note:'Mid chest.'},
+    {id:'dips',n:'Weighted dips',s:1,r:[6,10],rir:'1–2',t:'main',load:'+20 kg'},
+    {id:'latB',n:'Lateral raise',s:3,r:[12,20],rir:'0–1',t:'iso',note:'Superset with the reverse pec deck.'},
+    {id:'rpd',n:'Reverse pec deck',s:2,r:[12,20],rir:'0–1',t:'iso'},
+    {id:'inccurl',n:'Incline DB curl',s:3,r:[10,15],rir:'1',t:'arm',inc:{7:1}}
+  ]},
+  hyroxA:{ name:'Heavy Sleds', tag:'HYROX template A, odd weeks, 35–45 min of work', stop:'The session ends on the written volume. A sled set more than 5 s slower than the first ends the sleds.', knee:true, ex:[
+    {id:'spush',n:'Sled push',s:4,r:[20,20],unit:'m',rir:'—',t:'main',load:'220 kg',note:'Go heavier by feel. Gym loads are training numbers; the floor changes the real resistance.'},
+    {id:'spull',n:'Sled pull',s:3,r:[20,20],unit:'m',rir:'—',t:'main',load:'153–180 kg'},
+    {id:'ergwb',n:'1000 m erg and 25 wall balls at 9 kg',s:2,r:[1,1],unit:'rounds',rir:'—',t:'main',note:'SkiErg, rower, or 2 km BikeErg. 90 s rest.'}
+  ]},
+  hyroxB:{ name:'Race Flow', tag:'HYROX template B, even weeks, 35–45 min of work', stop:'BBJ: anything in the knee on landing ends BBJ for the day; do 40 wall balls instead. Knee worse next morning: BBJ come out and return after two clean weeks, from 20 m.', knee:true, ex:[
+    {id:'rf1',n:'750 m erg, sled push 2 × 12.5 m at 202 kg',s:1,r:[1,1],unit:'round',rir:'—',t:'main'},
+    {id:'rf2',n:'750 m erg, BBJ 40 m',s:1,r:[1,1],unit:'round',rir:'—',t:'main',note:'Soft two-foot landing, knees over toes, medium jumps.'},
+    {id:'rf3',n:'750 m erg, farmers carry 200 m at 2 × 32 kg',s:1,r:[1,1],unit:'round',rir:'—',t:'main'},
+    {id:'rf4',n:'750 m erg, 40 wall balls',s:1,r:[1,1],unit:'round',rir:'—',t:'main',note:'The round-four erg lands within 3 s of round one.'}
+  ]}
+};
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const sessionFor = (dow,wk) => ['lower','upperA','engine','upperB',null,(wk%2?'hyroxA':'hyroxB'),null][dow];
+
+function prescribe(ex,wk){
+  let s=ex.s, r=ex.r.slice(), rir=ex.rir, note=ex.note||'';
+  if (ex.w9 && wk>=9 && wk!==12){ s=ex.w9.s; r=ex.w9.r; note=ex.w9.note; }
+  if (ex.inc) for (const w in ex.inc) if (wk>=+w && wk!==6 && wk!==12) s+=ex.inc[w];
+  if (wk<=2){ if (ex.t!=='main' && s>1) s-=1; rir='3'; }
+  if (ex.t==='arm' && wk<=2) rir='2–3';
+  if (ex.t==='arm' && wk>=7 && wk!==12) rir='0–1';
+  if (wk===6 || wk===12){ s=Math.max(1,Math.round(s/2)); rir='3–4'; }
+  return {s,r,rir,note};
+}
+
+/* theme follows the phase */
+function setAccent(wk){ const w=WEEKS[Math.min(12,Math.max(1,wk))]; const c=PH[w.ph].hex; document.documentElement.style.setProperty('--accent', w.ph==='entry' ? '#DAD6CC' : c); }
+
+/* logs */
+const getLog = () => store.get(K.log,{});
+const getBody = () => store.get(K.body,{});
+const avg = a => { a=a.filter(x=>x!=null&&!isNaN(x)); return a.length?a.reduce((s,x)=>s+x,0)/a.length:null; };
+function lastPerf(id,before){ const log=getLog(); for (const d of Object.keys(log).filter(d=>d<before).sort().reverse()){ const s=log[d]?.sets?.[id]; if (s&&s.some(x=>x&&(x.w||x.r))) return {date:d,sets:s.filter(Boolean)}; } return null; }
+function hint(ex,p,before){
+  const last=lastPerf(ex.id,before);
+  if (!last) return {cls:'hold',txt: ex.load?`Start around ${ex.load} and find the load that leaves ${p.rir} in reserve.`:`First time: pick a load that leaves ${p.rir} in reserve.`};
+  const done=last.sets.filter(x=>x.r); const w=Math.max(...done.map(x=>+x.w||0));
+  const top=done.length>=Math.min(p.s,last.sets.length) && done.every(x=>+x.r>=p.r[1]);
+  const step=ex.t==='main'?(/DB|dumbbell/i.test(ex.n)?2:2.5):1;
+  if (top && w) return {cls:'',txt:`${fmt(parse(last.date))}: ${w} kg, every set at the top. Go to ${+(w+step).toFixed(1)} kg.`};
+  return {cls:'hold',txt:`${fmt(parse(last.date))}: ${done.map(x=>`${x.w||'?'} × ${x.r}`).join(', ')}. Same load, beat the reps.`};
+}
+
+/* hero + numbers */
+function renderHero(){
+  const now=new Date(), wk=weekOf(now);
+  $('todayDate').textContent = now.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'});
+  if (wk<1){ const d=Math.ceil((START-now)/DAY); $('heroTitle').innerHTML = `Starts in ${d} day${d===1?'':'s'}`; $('heroPhase').innerHTML = `Week 1 opens on <b>Monday 23 November</b>. ${WEEKS[1].n}`; setAccent(1); }
+  else if (wk>12){ $('heroTitle').textContent='Block done'; $('heroPhase').textContent='Twelve weeks complete. Time for the W12 decision.'; setAccent(12); }
+  else { $('heroTitle').innerHTML = `Week ${wk} <span class="of">of 12</span>`; $('heroPhase').innerHTML = `<b>${WEEKS[wk].p}.</b> ${WEEKS[wk].n}`; setAccent(wk); }
+  drawBar(wk);
+  $('legend').innerHTML = Object.values(PH).map(p=>`<span><i style="background:${p.col}"></i>${p.name}</span>`).join('');
+}
+function drawBar(cur){
+  const W=960,H=190,cy=92, x0=70, x1=890, n=12, gap=(x1-x0)/n;
+  let g = `<rect x="8" y="${cy-5}" width="${W-16}" height="10" rx="5" fill="#5E6863"/>`;
+  g += `<rect x="40" y="${cy-14}" width="14" height="28" rx="3" fill="#7A847F"/><rect x="${W-54}" y="${cy-14}" width="14" height="28" rx="3" fill="#7A847F"/>`;
+  for (let w=1; w<=12; w++){
+    const info=WEEKS[w], hex=PH[info.ph].hex, ph=150*info.size, pw=Math.max(24,gap-14), px=x0+(w-1)*gap+(gap-pw)/2, py=cy-ph/2;
+    const past = cur>w, now = cur===w, fut = cur<w;
+    const fill = fut ? 'transparent' : hex, stroke = hex, op = past ? .55 : 1;
+    const txt = info.ph==='entry'||info.ph==='block2' ? '#1B2220' : '#ECE8DF';
+    g += `<g class="plate" tabindex="0" role="button" aria-label="Week ${w}, ${info.p}" data-w="${w}" style="transform-origin:${px+pw/2}px ${cy}px">`+
+      `<rect class="p" x="${px}" y="${py}" width="${pw}" height="${ph}" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="${fut?2:0}" opacity="${op}"/>`+
+      `<rect x="${px+pw/2-3}" y="${py+8}" width="6" height="${ph-16}" rx="3" fill="${fut?'transparent':'rgba(0,0,0,.18)'}" opacity="${op}"/>`+
+      `<text x="${px+pw/2}" y="${cy+ph/2-10}" text-anchor="middle" font-family="Big Shoulders Display, Impact, sans-serif" font-weight="800" font-size="18" fill="${fut?hex:txt}" opacity="${op}">${w}</text>`+
+      (now?`<path d="M${px+pw/2-8} ${py-16} L${px+pw/2+8} ${py-16} L${px+pw/2} ${py-6} Z" fill="${hex}"/><text x="${px+pw/2}" y="${py-22}" text-anchor="middle" font-family="Atkinson Hyperlegible, system-ui, sans-serif" font-weight="700" font-size="14" fill="#ECE8DF">now</text>`:'')+
+      `</g>`;
+  }
+  const sx=fmt(START), ex=fmt(new Date(START.getTime()+83*DAY));
+  g += `<text x="${x0}" y="${H-6}" font-family="Atkinson Hyperlegible, system-ui, sans-serif" font-size="13" fill="#A3ABA6">${sx}</text><text x="${x1}" y="${H-6}" text-anchor="end" font-family="Atkinson Hyperlegible, system-ui, sans-serif" font-size="13" fill="#A3ABA6">${ex}</text>`;
+  $('bar').innerHTML = g;
+}
+function renderNums(){
+  const now=new Date(), wk=weekOf(now), b=getBody(), log=getLog();
+  const a=avg7(iso(now)); const start=avg(Object.keys(b).filter(d=>parse(d)<new Date(START.getTime()+7*DAY)).map(d=>b[d].weight));
+  const best=id=>{ let m=null; Object.values(log).forEach(l=>(l.sets?.[id]||[]).forEach(s=>{ if(s&&s.w&&s.r&&(!m||s.w>m.w||(s.w===m.w&&s.r>m.r))) m=s; })); return m; };
+  const bp=best('bench'), pu=best('pullup'); const done=Object.values(log).filter(l=>l.week===wk).length;
+  $('nums').innerHTML = `
+   <div class="num"><div class="v">${a?a.toFixed(1):'85.0'}</div><div class="l">Weight, 7-day average</div><div class="t">${a&&start?`${a-start>=0?'+':''}${(a-start).toFixed(1)} kg since W1`:'Target 87–88.5 kg'}</div></div>
+   <div class="num"><div class="v">${bp?`${bp.w}×${bp.r}`:'80×6'}</div><div class="l">Bench, best set</div><div class="t">Target 80 × 9–10</div></div>
+   <div class="num"><div class="v">${pu?`+${pu.w}×${pu.r}`:'+20×6'}</div><div class="l">Pull-up, best set</div><div class="t">Target +25 × 6</div></div>
+   <div class="num"><div class="v">${Math.max(0,done)}/${wk<=2?4:5}</div><div class="l">Sessions this week</div><div class="t">Logged on this device</div></div>`;
+}
+
+/* today */
+let selDate = new Date();
+function renderToday(){
+  const wk=Math.min(12,Math.max(1,weekOf(selDate))), dow=(selDate.getDay()+6)%7, key=iso(selDate), sid=sessionFor(dow,wk), log=getLog();
+  $('t-week').innerHTML = Array.from({length:12},(_,i)=>`<option value="${i+1}" ${i+1===wk?'selected':''}>Week ${i+1}, ${WEEKS[i+1].p}</option>`).join('');
+  $('t-days').innerHTML = DAYS.map((d,i)=>{ const dt=new Date(START.getTime()+((wk-1)*7+i)*DAY), k=iso(dt), has=sessionFor(i,wk);
+    return `<button data-d="${k}" aria-pressed="${k===key}">${d}${has?`<span class="dot ${log[k]?'done':''}"></span>`:''}<b>${dt.getDate()}</b></button>`; }).join('');
+  $('t-date').textContent = selDate.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const body=$('t-body');
+  if (!sid){
+    $('t-title').textContent = dow===4?'Spare day':'Recovery';
+    $('t-meta').textContent = dow===4?'A missed Upper B moves here. Otherwise rest, so legs are fresh for Saturday.':'Walk 30–60 minutes, 10 minutes of hip and upper-back mobility, bed at 21:30.';
+    body.innerHTML = `<div class="callout"><strong>${WEEKS[wk].p}</strong>${WEEKS[wk].n}</div>`; return;
+  }
+  const s=S[sid]; $('t-title').textContent=s.name; $('t-meta').textContent=s.tag;
+  const saved=log[key]?.sets||{};
+  let h = `<div class="callout"><strong>${WEEKS[wk].p}</strong>${WEEKS[wk].n}</div>`;
+  if (s.vo2){
+    const g=gateState();
+    h += wk<=2
+      ? `<div class="callout"><strong>BikeErg</strong>${wk===2?'One test today: 4 × 4 min at RPE 8. Log the watts in Engine; they become your baseline.':'Week 1 is the arm and delt block only, and it is optional.'}</div>`
+      : `<div class="callout ${g.off?'warn':'good'}"><strong>BikeErg intervals: ${g.off?'off today':'on'}</strong>${wk>=7?(wk%2?'5 × 4 min, 3 min easy between.':'3 series of 13 × 30 s on, 15 s off, 3 min between series.'):'4 × 4 min at RPE 8, 3 min easy between, one watt target for all four.'} Warm up for 10 minutes with three 10-second pickups.</div>`;
+  }
+  s.ex.forEach(ex=>{
+    const p=prescribe(ex,wk), hn=hint(ex,p,key), unit=ex.unit||'';
+    const rng=p.r[0]===p.r[1]?p.r[0]:`${p.r[0]}–${p.r[1]}`, sv=saved[ex.id]||[];
+    let sets='';
+    if (ex.rir!=='—') for (let i=0;i<p.s;i++){ const v=sv[i]||{}; sets+=`<div class="set"><span class="i">${i+1}</span><input type="number" step="0.5" inputmode="decimal" placeholder="kg" aria-label="${ex.n} set ${i+1} kg" data-ex="${ex.id}" data-i="${i}" data-f="w" value="${v.w??''}"><span class="x">×</span><input type="number" inputmode="numeric" placeholder="${unit==='m'?'m':'reps'}" aria-label="${ex.n} set ${i+1} reps" data-ex="${ex.id}" data-i="${i}" data-f="r" value="${v.r??''}"></div>`; }
+    else sets=`<div class="set wide"><input type="text" placeholder="Times and notes" aria-label="${ex.n} result" data-ex="${ex.id}" data-i="0" data-f="t" value="${(sv[0]||{}).t??''}"></div>`;
+    h += `<div class="ex"><div class="ex-top"><div class="ex-n">${ex.n}</div><div class="ex-rx">${p.s} × ${rng}${unit?` ${unit}`:''}<small>RIR ${p.rir}</small></div>${(ex.load||p.note)?`<div class="ex-note">${ex.load?`<b style="color:var(--chalk)">${ex.load}.</b> `:''}${p.note}</div>`:''}${ex.rir!=='—'?`<div class="ex-hint ${hn.cls}">${hn.txt}</div>`:''}</div><div class="sets">${sets}</div></div>`;
+  });
+  h += `<div class="callout warn"><strong>Stop condition</strong>${s.stop}</div>`;
+  if (s.knee) h += `<div class="callout warn"><strong>Knee</strong>Pain rising or the movement changing ends that exercise for today. Pain, swelling or a limp tomorrow means reviewing the week.</div>`;
+  h += `<div style="margin-top:18px"><label class="f" for="t-notes">Session notes</label><textarea id="t-notes" rows="3" placeholder="Knee, energy, anything unusual">${log[key]?.notes||''}</textarea></div><div class="row" style="margin-top:12px"><button class="btn" id="t-save">Save session</button></div>`;
+  body.innerHTML=h;
+  $('t-save').onclick=()=>saveSession(key,sid);
+}
+function saveSession(key,sid){
+  const log=getLog(), sets={};
+  document.querySelectorAll('#t-body input[data-ex]').forEach(inp=>{ const e=inp.dataset.ex,i=+inp.dataset.i,f=inp.dataset.f; sets[e]=sets[e]||[]; sets[e][i]=sets[e][i]||{}; if(inp.value!=='') sets[e][i][f]=f==='t'?inp.value:+inp.value; });
+  log[key]={session:sid,week:weekOf(parse(key)),sets,notes:$('t-notes').value,saved:new Date().toISOString()};
+  store.set(K.log,log); toast('Session saved'); renderNums(); renderToday();
+}
+
+/* plan */
+function renderPlan(){
+  const now=weekOf(new Date());
+  $('weeks').innerHTML = Array.from({length:12},(_,i)=>{ const w=i+1,a=new Date(START.getTime()+i*7*DAY),b=new Date(a.getTime()+6*DAY),info=WEEKS[w];
+    return `<button class="wk ${w===now?'now':''}" data-w="${w}"><span class="stripe" style="background:${PH[info.ph].col}"></span><div class="n">W${w}</div><div class="d">${fmt(a)} to ${fmt(b)}</div><div class="p" style="color:${PH[info.ph].col}">${info.p}</div><div class="c">${info.n}</div></button>`; }).join('');
+  $('layout').innerHTML = `<tr><th>Day</th><th>Session</th><th>Sets</th><th>Time</th></tr>`+[['Mon','Lower','15','65–70 min'],['Tue','Upper A, strength and hypertrophy','23','75 min'],['Wed','Engine: BikeErg VO2, then arms, delts and abs','11','50–60 min'],['Thu','Upper B, upper chest first','21','75 min'],['Fri','Rest, spare day','',''],['Sat','HYROX: Heavy Sleds in odd weeks, Race Flow in even','','35–45 min'],['Sun','Recovery walk','','30–60 min']].map(r=>`<tr><td class="n">${r[0]}</td><td>${r[1]}</td><td class="n">${r[2]}</td><td class="small">${r[3]}</td></tr>`).join('');
+  const vol=[['Back',13],['Chest',13],['Quads',13],['Side delts',10],['Biceps',9],['Triceps',6],['Abs',3],['Rear delts',2],['Hamstrings',2]];
+  $('vol').innerHTML = vol.map(([l,v])=>`<div class="vrow"><div class="l">${l}</div><div class="t"><div class="z" style="left:${10/16*100}%;width:${4/16*100}%"></div><div class="f" style="width:${v/16*100}%"></div></div><div class="v">${v}</div></div>`).join('');
+}
+
+/* body */
+function avg7(endIso){ const b=getBody(), e=parse(endIso), arr=[]; for(let i=0;i<7;i++){ const d=iso(new Date(e.getTime()-i*DAY)); if(b[d]?.weight) arr.push(+b[d].weight); } return avg(arr); }
+function saveBody(){
+  const d=$('b-date').value||iso(new Date()), b=getBody(), num=id=>{ const v=$(id).value; return v===''?null:+v; };
+  b[d]={weight:num('b-w'),waist:num('b-waist'),sleep:num('b-sleep'),rhr:num('b-rhr'),knee:num('b-knee'),energy:num('b-en'),legsHeavy:$('b-legs').checked,swelling:$('b-swell').checked};
+  store.set(K.body,b); toast('Check-in saved'); renderBody(); renderNums(); renderEngine();
+}
+function bodyFlags(r){ const f=[];
+  if (r.swelling) f.push('<div class="callout warn"><strong>Knee swelling or limp</strong>Review this week\'s leg load. If it comes back, see the sports physio.</div>');
+  if (r.knee>=3) f.push(`<div class="callout warn"><strong>Knee at ${r.knee}/10</strong>That is above the 2/10 line: no BBJ and no running today, and leg work stops at the first rising pain.</div>`);
+  if (r.sleep!=null && r.sleep<6.5) f.push('<div class="callout warn"><strong>Short sleep</strong>Under 6.5 hours. Two nights like this and Wednesday becomes the arm and delt block only.</div>');
+  return f.join(''); }
+function renderBody(){
+  const b=getBody(), dates=Object.keys(b).sort(), today=$('b-date').value||iso(new Date()), r=b[today];
+  ['b-w','b-waist','b-sleep','b-rhr','b-knee','b-en'].forEach((id,i)=>{ $(id).value = r?.[['weight','waist','sleep','rhr','knee','energy'][i]] ?? ''; });
+  $('b-legs').checked=!!r?.legsHeavy; $('b-swell').checked=!!r?.swelling; $('b-flags').innerHTML=r?bodyFlags(r):'';
+  $('b-table').innerHTML = `<tr><th>Date</th><th>Week</th><th>Kg</th><th>7-day</th><th>Waist</th><th>Sleep</th><th>HR</th><th>Knee</th></tr>`+(dates.length?dates.slice().reverse().slice(0,40).map(d=>{ const x=b[d],a=avg7(d); return `<tr><td>${fmt(parse(d))}</td><td class="small">W${weekOf(parse(d))}</td><td class="n">${x.weight??''}</td><td class="n" style="color:var(--accent)">${a?a.toFixed(2):''}</td><td>${x.waist??''}</td><td>${x.sleep??''}</td><td>${x.rhr??''}</td><td style="color:${x.knee>=3||x.swelling?'var(--p-peak)':'inherit'}">${x.knee??''}${x.swelling?', swelling':''}</td></tr>`; }).join(''):`<tr><td colspan="8" class="small">No check-ins yet. Your first morning weight starts the trend.</td></tr>`);
+  calorieCall(); drawChart();
+}
+function waistTrend(){ const b=getBody(), ds=Object.keys(b).filter(d=>b[d].waist).sort(); if(ds.length<2) return null; const last=ds[ds.length-1], cut=iso(new Date(parse(last).getTime()-14*DAY)), old=ds.filter(d=>d<=cut).pop(); return old?b[last].waist-b[old].waist:null; }
+function calorieCall(){
+  const wk=weekOf(new Date()), a1=avg7(iso(new Date())), a0=avg7(iso(new Date(Date.now()-7*DAY))), am=avg7(iso(new Date(Date.now()-14*DAY)));
+  const base = wk<=2?3450:3700, el=$('b-cal');
+  if (!a1||!a0){ el.innerHTML=`<div class="big">${base}<small>kcal a day</small></div><p class="small" style="margin-top:10px">${wk<=2?'Calibration at maintenance.':'Surplus of about 250.'} The weekly decision appears once there are two weeks of morning weights.</p>`; return; }
+  const rate=a1-a0, prev=am?a0-am:null, wa=waistTrend(); let call,cls;
+  if (wk<=2){ call=Math.abs(rate)<=.3?'Maintenance is about 3450':rate<-.3?'Maintenance is higher: add 200':'Already gaining: hold'; cls='hold'; }
+  else if (wa!=null && wa>=1){ call='Take off 150 kcal, waist is up 1 cm'; cls='down'; }
+  else if (rate>.4){ call='Take off 150 kcal'; cls='down'; }
+  else if (rate<.15 && prev!=null && prev<.15){ call='Add 150 kcal of carbs'; cls='up'; }
+  else if (rate>=.2 && rate<=.35){ call='Hold'; cls='hold'; }
+  else { call='Hold and watch next week'; cls=''; }
+  el.innerHTML=`<div class="big">${rate>=0?'+':''}${rate.toFixed(2)}<small>kg this week</small></div><p class="small" style="margin-top:8px">7-day average ${a1.toFixed(2)} kg, last week ${a0.toFixed(2)} kg${wa!=null?`, waist ${wa>=0?'+':''}${wa.toFixed(1)} cm over two weeks`:''}.</p><span class="pill ${cls}">${call}</span>`;
+}
+function drawChart(){
+  const b=getBody(), W=900,H=300,pl=40,pr=14,pt=14,pb=30, t0=START.getTime(), t1=t0+84*DAY;
+  const pts=Object.keys(b).filter(d=>b[d].weight).sort().map(d=>({t:parse(d).getTime(),w:+b[d].weight,a:avg7(d)}));
+  const base = pts.length ? (avg(pts.filter(p=>p.t<t0+14*DAY).map(p=>p.w)) ?? pts[0].w) : 84.8;
+  let lo=Math.floor(Math.min(base-1,...pts.map(p=>p.w))), hi=Math.ceil(Math.max(base+4,...pts.map(p=>p.w)));
+  const x=t=>pl+(t-t0)/(t1-t0)*(W-pl-pr), y=w=>pt+(hi-w)/(hi-lo)*(H-pt-pb);
+  let g='';
+  for(let v=lo;v<=hi;v++) g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="#38433F"/><text x="${pl-8}" y="${y(v)+4}" fill="#A3ABA6" font-family="Atkinson Hyperlegible, system-ui, sans-serif" font-size="12" text-anchor="end">${v}</text>`;
+  for(let w=1;w<=12;w+=1){ const xx=x(t0+(w-1)*7*DAY); g+=`<text x="${xx+3}" y="${H-8}" fill="#6E7873" font-family="Atkinson Hyperlegible, system-ui, sans-serif" font-size="12">W${w}</text>`; }
+  const c0=t0+14*DAY, band=[[t0,base,base],[c0,base,base],[t1,base+.2*10,base+.35*10]];
+  g+=`<polygon points="${band.map(p=>`${x(p[0])},${y(p[2])}`).join(' ')} ${band.slice().reverse().map(p=>`${x(p[0])},${y(p[1])}`).join(' ')}" fill="rgba(226,178,58,.12)" stroke="rgba(226,178,58,.6)" stroke-dasharray="5 5"/>`;
+  g+=pts.map(p=>`<circle cx="${x(p.t)}" cy="${y(p.w)}" r="3" fill="#6E7873"/>`).join('');
+  const ap=pts.filter(p=>p.a); if(ap.length>1) g+=`<polyline points="${ap.map(p=>`${x(p.t)},${y(p.a)}`).join(' ')}" fill="none" stroke="#ECE8DF" stroke-width="2.5" stroke-linejoin="round"/>`;
+  const nx=x(Date.now()); if(nx>pl&&nx<W-pr) g+=`<line x1="${nx}" x2="${nx}" y1="${pt}" y2="${H-pb}" stroke="#ECE8DF" stroke-opacity=".3" stroke-dasharray="3 4"/>`;
+  if(!pts.length) g+=`<text x="${W/2}" y="${H/2}" fill="#A3ABA6" font-family="Atkinson Hyperlegible, system-ui, sans-serif" font-size="15" text-anchor="middle">Log your first morning weight to start the line.</text>`;
+  $('chart').innerHTML=g;
+}
+
+/* engine */
+function gateState(){ const b=getBody(), t=iso(new Date()), r=b[t]||{}, rh=Object.keys(b).filter(d=>d<t&&b[d].rhr).sort().slice(-14).map(d=>+b[d].rhr), base=avg(rh);
+  const c1=r.sleep!=null&&r.sleep<6.5, c2=r.rhr!=null&&base!=null&&r.rhr>=base+5, c3=!!r.legsHeavy; return {c1,c2,c3,base,r,off:(c1+c2+c3)>=2}; }
+function engVerdict(r){ const w=r.w.filter(Boolean), a=avg(w)||0, sp=a?(Math.max(...w)-Math.min(...w))/a*100:0;
+  if(sp<=3&&(r.rpe??10)<=8) return {avg:a,spread:sp,cls:'hold',txt:'Add 5–10 W or a fifth interval'}; if(sp>3) return {avg:a,spread:sp,cls:'up',txt:'Same watts next week'}; return {avg:a,spread:sp,cls:'',txt:'Hold'}; }
+function renderEngine(){
+  const g=gateState();
+  $('gate').innerHTML=[[g.c1,'Sleep under 6.5 h',g.r.sleep!=null?`${g.r.sleep} h last night`:'Not logged today'],[g.c2,'Resting HR up 5',g.base?`14-day average ${g.base.toFixed(0)}${g.r.rhr?`, today ${g.r.rhr}`:''}`:'Needs a few days of data'],[g.c3,'Legs still heavy','From the morning check-in']].map(([h,t,s])=>`<div class="${h?'hit':''}"><b>${h?'Yes':'No'}</b>${t}<div class="small">${s}</div></div>`).join('');
+  $('verdict').innerHTML = g.off?'<span style="color:var(--p-peak)">Intervals off. Arms and delts only.</span>':'<span style="color:var(--p-deload)">Intervals on.</span>';
+  const e=store.get(K.eng,[]);
+  $('e-table').innerHTML=`<tr><th>Date</th><th>Week</th><th>Watts</th><th>Average</th><th>Spread</th><th>RPE</th><th>Next</th></tr>`+(e.length?e.slice().reverse().map(r=>{ const v=engVerdict(r); return `<tr><td>${fmt(parse(r.date))}</td><td class="small">W${weekOf(parse(r.date))}</td><td>${r.w.join(', ')}</td><td class="n">${v.avg.toFixed(0)}</td><td style="color:${v.spread>3?'var(--p-peak)':'var(--p-deload)'}">${v.spread.toFixed(1)}%</td><td>${r.rpe??''}</td><td><span class="pill ${v.cls}" style="margin:0">${v.txt}</span></td></tr>`; }).join(''):`<tr><td colspan="7" class="small">Your first 4 × 4 in week 2 sets the baseline.</td></tr>`);
+}
+function saveEngine(){ const w=[1,2,3,4,5].map(i=>+$('e-'+i).value||0).filter(Boolean); if(!w.length) return toast('Enter the watts first');
+  const r={date:$('e-date').value||iso(new Date()),w,rpe:+$('e-rpe').value||null,hr:+$('e-hr').value||null};
+  const e=store.get(K.eng,[]).filter(x=>x.date!==r.date); e.push(r); e.sort((a,b)=>a.date<b.date?-1:1); store.set(K.eng,e);
+  const v=engVerdict(r); $('e-verdict').innerHTML=`<div class="callout good"><strong>${v.avg.toFixed(0)} W average, ${v.spread.toFixed(1)}% spread</strong>${v.txt}.</div>`; renderEngine(); toast('Intervals saved'); }
+
+/* fuel */
+function renderFuel(){ const wk=weekOf(new Date());
+  $('macros').innerHTML=`<tr><th>Phase</th><th>kcal</th><th>Protein</th><th>Carbs</th><th>Fat</th></tr><tr style="${wk<=2?'color:var(--accent)':''}"><td>W1–W2, finding maintenance</td><td class="n">3455</td><td class="n">170</td><td class="n">480</td><td class="n">95</td></tr><tr style="${wk>2?'color:var(--accent)':''}"><td>From W3, surplus of 250</td><td class="n">3740</td><td class="n">170</td><td class="n">540</td><td class="n">100</td></tr>`; }
+
+/* data */
+const exportText=()=>JSON.stringify({exported:new Date().toISOString(),log:getLog(),body:getBody(),engine:store.get(K.eng,[])},null,2);
+function dl(name,text,type){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+function allEx(){ const m={}; Object.values(S).forEach(s=>s.ex.forEach(e=>{ if(e.rir!=='—') m[e.id]=e.n; })); return m; }
+function importText(t){ try{ const j=JSON.parse(t); if(j.log) store.set(K.log,{...getLog(),...j.log}); if(j.body) store.set(K.body,{...getBody(),...j.body}); if(j.engine) store.set(K.eng,j.engine); toast('Data imported'); renderData(); renderNums(); }catch(e){ toast('That is not a valid export'); } }
+function renderData(){ const log=getLog(), b=getBody(), e=store.get(K.eng,[]);
+  $('d-sum').textContent=`${Object.keys(log).length} sessions, ${Object.keys(b).length} check-ins and ${e.length} interval logs on this device.`;
+  const ex=allEx(), sel=$('d-ex'); if(!sel.options.length) sel.innerHTML=Object.entries(ex).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+  const id=sel.value, rows=Object.keys(log).sort().reverse().filter(d=>log[d].sets?.[id]?.some(s=>s&&(s.w||s.r)));
+  $('d-hist').innerHTML=`<tr><th>Date</th><th>Week</th><th>Sets</th><th>Top kg</th></tr>`+(rows.length?rows.map(d=>{ const ss=log[d].sets[id].filter(Boolean); return `<tr><td>${fmt(parse(d))}</td><td class="small">W${log[d].week}</td><td>${ss.map(s=>`${s.w??'?'} × ${s.r??'?'}`).join(', ')}</td><td class="n">${Math.max(...ss.map(s=>s.w||0))||''}</td></tr>`; }).join(''):`<tr><td colspan="4" class="small">No sets logged for this exercise yet.</td></tr>`); }
+
+/* ui */
+function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('on'),1700); }
+function openTab(p){ document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p===p)); document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));
+  ({today:renderToday,plan:renderPlan,body:renderBody,engine:renderEngine,fuel:renderFuel,data:renderData}[p]||(()=>{}))(); }
+document.querySelector('nav.tabs').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) openTab(b.dataset.p); });
+$('t-days').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; selDate=parse(b.dataset.d); renderToday(); });
+$('t-week').addEventListener('change',e=>{ const dow=(selDate.getDay()+6)%7; selDate=new Date(START.getTime()+((+e.target.value-1)*7+dow)*DAY); renderToday(); });
+function goWeek(w){ selDate=new Date(START.getTime()+(w-1)*7*DAY); openTab('today'); document.querySelector('nav.tabs').scrollIntoView({behavior:'smooth'}); }
+$('weeks').addEventListener('click',e=>{ const w=e.target.closest('.wk'); if(w) goWeek(+w.dataset.w); });
+$('bar').addEventListener('click',e=>{ const p=e.target.closest('.plate'); if(p) goWeek(+p.dataset.w); });
+$('bar').addEventListener('keydown',e=>{ const p=e.target.closest('.plate'); if(p&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); goWeek(+p.dataset.w); } });
+$('b-save').onclick=saveBody; $('b-date').addEventListener('change',renderBody); $('e-save').onclick=saveEngine; $('d-ex').addEventListener('change',renderData);
+$('d-exp').onclick=()=>dl(`wolf_mass_${iso(new Date())}.json`,exportText(),'application/json');
+$('d-csv').onclick=()=>{ const log=getLog(),ex=allEx(); let c='date,week,session,exercise,set,kg,reps\n'; Object.keys(log).sort().forEach(d=>{ const l=log[d]; Object.entries(l.sets||{}).forEach(([id,ss])=>(ss||[]).forEach((s,i)=>{ if(s&&(s.w!=null||s.r!=null)) c+=`${d},${l.week},${l.session},"${ex[id]||id}",${i+1},${s.w??''},${s.r??''}\n`; })); }); dl(`wolf_mass_sets_${iso(new Date())}.csv`,c,'text/csv'); };
+$('d-imp').onchange=e=>{ const f=e.target.files[0]; if(f) f.text().then(importText); };
+$('d-pimp').onclick=()=>importText($('d-paste').value);
+$('d-copy').onclick=()=>{ const t=exportText(); const fb=()=>{ $('d-paste').value=t; $('d-paste').select(); toast('Selected in the box, copy it from there'); };
+  if(navigator.clipboard) navigator.clipboard.writeText(t).then(()=>toast('Data copied'),fb); else fb(); };
+$('d-clr').onclick=()=>{ const b=$('d-clr'); if(b.dataset.arm){ store.set(K.log,{}); store.set(K.body,{}); store.set(K.eng,[]); toast('Everything cleared'); renderData(); renderNums(); delete b.dataset.arm; b.textContent='Clear everything'; } else { b.dataset.arm=1; b.textContent='Tap again to clear'; } };
+
+$('b-date').value=iso(new Date()); $('e-date').value=iso(new Date());
+if (weekOf(selDate)<1) selDate=new Date(START);
+renderHero(); renderNums(); renderToday();
+</script>
+</body>
+</html>
