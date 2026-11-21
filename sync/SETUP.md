@@ -64,3 +64,23 @@ Run it once by hand and check the `Health` tab.
 - Read: `Weekly` for the Sunday close-out, `Health` + `CheckIns` for sleep and recovery trends, `Sets` for progression.
 - Write: add a row to `CheckIns`, `Health` or `Sessions` by date when Yaro reports numbers in chat. One row per date; edit the existing row if the date is there.
 - The `Weekly` tab is rebuilt by the script on every save and nightly at 04:00. Do not edit it by hand.
+
+## 4. iPhone Shortcut: workout data after each session
+
+The site's **Pull workout from Apple Watch** button (Today tab) opens this shortcut and passes it the key, the Sheet URL, the date and the session name. Build it once; the name must be exactly **Wolf Workout**.
+
+1. Shortcut settings (ⓘ) → **Receive** *Text* input from *Shortcuts / anywhere*; If there's no input: *Stop and respond*.
+2. **Get Dictionary from** *Shortcut Input*.
+3. **Get Dictionary Value** for `key` → variable `Key`. Repeat for `url` → `Url`, `date` → `Day`, `session` → `Session`.
+4. **Find Health Samples** — Type: *Heart Rate* · Start Date *is in the last* 2 hours → variable `HR`.
+5. **Get Details of Health Samples** — *Value* (from `HR`) → **Calculate Statistics** *Average* → **Round Number** → variable `AvgHR`.
+6. **Get Details of Health Samples** — *Value* (from `HR`) → **Calculate Statistics** *Maximum* → variable `MaxHR`.
+7. **Find Health Samples** — Type: *Active Energy* · Start Date *is in the last* 2 hours → **Get Details** *Value* → **Calculate Statistics** *Sum* → **Round Number** → variable `Kcal`.
+8. Optional minutes: **Get Details of Health Samples** *Start Date* from `HR` → **Get Item from List** *First Item* → **Get Time Between Dates** (that date and *Current Date*) in *Minutes* → variable `Minutes`.
+9. **Dictionary**: `key` → Key · `type` → `workout` · `data` (Dictionary) → `date`: Day · `session`: Session · `avgHr`: AvgHR · `maxHr`: MaxHR · `activeKcal`: Kcal · `minutes`: Minutes.
+10. **Get Contents of URL** — URL: `Url` · Method **POST** · Request Body **File** → the Dictionary.
+11. **Show Notification** — "Workout saved to Sheet".
+12. **Open URLs** — `https://yaroriver.github.io/wolf-mass/` (back to the app).
+
+Press the button within about an hour of finishing; the window is the last 2 hours, so a long gap pulls in rest time.
+After `Code.gs` changes: Deploy → Manage deployments → edit → Version: New version → Deploy (same URL).

@@ -661,9 +661,10 @@ function renderToday(){
   });
   h += `<div class="callout warn"><strong>Stop condition</strong>${s.stop}</div>`;
   if (s.knee) h += `<div class="callout warn"><strong>Knee</strong>Pain rising or the movement changing ends that exercise for today. Pain, swelling or a limp tomorrow means reviewing the week.</div>`;
-  h += `<div style="margin-top:18px"><label class="f" for="t-notes">Session notes</label><textarea id="t-notes" rows="3" placeholder="Knee, energy, anything unusual">${log[key]?.notes||''}</textarea></div><div class="row" style="margin-top:12px"><button class="btn" id="t-save">Save session</button></div>`;
+  h += `<div style="margin-top:18px"><label class="f" for="t-notes">Session notes</label><textarea id="t-notes" rows="3" placeholder="Knee, energy, anything unusual">${log[key]?.notes||''}</textarea></div><div class="row" style="margin-top:12px"><button class="btn" id="t-save">Save session</button><button class="btn ghost" id="t-watch">Pull workout from Apple Watch</button></div><p class="small" style="margin-top:8px">Runs the Wolf Workout shortcut: heart rate and active calories from the last 2 hours go to the Sheet.</p>`;
   body.innerHTML=h;
   $('t-save').onclick=()=>saveSession(key,sid);
+  $('t-watch').onclick=()=>{ const inp=JSON.stringify({key:cfg().key||'',date:key,session:sid,url:cfg().url||''}); location.href='shortcuts://run-shortcut?name='+encodeURIComponent('Wolf Workout')+'&input=text&text='+encodeURIComponent(inp); };
 }
 function saveSession(key,sid){
   const log=getLog(), sets={};

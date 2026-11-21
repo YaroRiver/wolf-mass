@@ -19,6 +19,7 @@ const TABS = {
   Sets:     ['date', 'week', 'session', 'exerciseId', 'exercise', 'set', 'kg', 'reps', 'text', 'updated'],
   Engine:   ['date', 'week', 'w1', 'w2', 'w3', 'w4', 'w5', 'avgW', 'spreadPct', 'rpe', 'peakHr', 'updated'],
   Health:   ['date', 'week', 'sleepHours', 'rhr', 'hrv', 'source', 'updated'],
+  Workouts: ['date', 'week', 'session', 'minutes', 'avgHr', 'maxHr', 'activeKcal', 'source', 'updated'],
   Weekly:   ['week', 'start', 'end', 'avgWeight', 'rateKg', 'waist', 'avgSleep', 'avgRhr', 'avgHrv', 'kneeMax', 'sessions', 'benchTop', 'pullupTop', 'bikeAvgW', 'calorieCall', 'updated']
 };
 const START = new Date(2026, 10, 23); // Mon 23 Nov 2026
@@ -58,6 +59,7 @@ function doPost(e) {
     else if (body.type === 'session') putSession(d);
     else if (body.type === 'engine') putEngine(d);
     else if (body.type === 'health') putHealth(d);
+    else if (body.type === 'workout') putWorkout(d);
     else if (body.type === 'bulk') {
       Object.keys(d.body || {}).forEach(date => putCheckin(Object.assign({ date: date }, d.body[date])));
       Object.keys(d.log || {}).forEach(date => putSession(Object.assign({ date: date }, d.log[date])));
@@ -99,6 +101,11 @@ function putEngine(d) {
 function putHealth(d) {
   const date = d.date || ds(new Date());
   upsert('Health', date, [date, weekOf(date), num(d.sleepHours), num(d.rhr), num(d.hrv), d.source || 'shortcut', now()]);
+}
+
+function putWorkout(d) {
+  const date = d.date || ds(new Date());
+  upsert('Workouts', date, [date, weekOf(date), d.session || '', num(d.minutes), num(d.avgHr), num(d.maxHr), num(d.activeKcal), d.source || 'shortcut', now()]);
 }
 
 /* weekly archive */
