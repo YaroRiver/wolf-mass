@@ -108,10 +108,11 @@ function putHealth(d) {
 function sleepFromRaw(raw) {
   let sec = 0;
   String(raw).split(/\r?\n/).forEach(line => {
-    const parts = line.split(';');
-    if (parts.length < 2) return;
-    if (/awake|in ?bed/i.test(parts[0])) return;
-    sec += durSec(parts.slice(1).join(';'));
+    let stage, dur;
+    if (line.indexOf(';') >= 0) { const p = line.split(';'); stage = p[0]; dur = p.slice(1).join(';'); }
+    else { const m = String(line).match(/^([^\d]*)(\d.*)$/); if (!m) return; stage = m[1]; dur = m[2]; }
+    if (/awake|in ?bed/i.test(stage)) return;
+    sec += durSec(dur);
   });
   return sec ? Math.round(sec / 360) / 10 : '';
 }
