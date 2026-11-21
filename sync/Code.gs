@@ -54,7 +54,7 @@ function doPost(e) {
   try {
     const body = JSON.parse(e.postData.contents || '{}');
     if (body.key !== getKey()) return out({ ok: false, error: 'bad key' });
-    const d = body.data || {};
+    const d = body.data || body; // flat bodies allowed (iOS Shortcuts)
     if (body.type === 'checkin') putCheckin(d);
     else if (body.type === 'session') putSession(d);
     else if (body.type === 'engine') putEngine(d);
