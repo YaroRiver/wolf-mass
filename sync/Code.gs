@@ -100,7 +100,33 @@ function putEngine(d) {
 }
 function putHealth(d) {
   const date = d.date || ds(new Date());
-  upsert('Health', date, [date, weekOf(date), num(d.sleepHours), num(d.rhr), num(d.hrv), d.source || 'shortcut', now()]);
+  const sleep = d.sleepRaw ? sleepFromRaw(d.sleepRaw) : num(d.sleepHours);
+  upsert('Health', date, [date, weekOf(date), sleep, num(d.rhr), num(d.hrv), d.source || 'shortcut', now()]);
+}
+
+/** sleepRaw: one line per Health sample, "<stage>;<duration>". Awake and In Bed are skipped. */
+function sleepFromRaw(raw) {
+  let sec = 0;
+  String(raw).split(/\r?\n/).forEach(line => {
+    const parts = line.split(';');
+    if (parts.length < 2) return;
+    if (/awake|in ?bed/i.test(parts[0])) return;
+    sec += durSec(parts.slice(1).join(';'));
+  });
+  return sec ? Math.round(sec / 360) / 10 : '';
+}
+function durSec(t) {
+  t = String(t).trim().replace(',', '.');
+  let m = t.match(/^(\d+):(\d{1,2})(?::(\d{1,2}))?$/);
+  if (m) return m[3] !== undefined ? (+m[1]) * 3600 + (+m[2]) * 60 + (+m[3]) : (+m[1]) * 60 + (+m[2]);
+  let s = 0, hit = false;
+  t.replace(/([\d.]+)\s*(h|hr|hrs|hour|hours|m|min|mins|minute|minutes|s|sec|secs|second|seconds)\b/gi, (_, n, u) => {
+    hit = true; u = u.toLowerCase();
+    s += parseFloat(n) * (u[0] === 'h' ? 3600 : u[0] === 'm' ? 60 : 1);
+  });
+  if (hit) return s;
+  const n = parseFloat(t);
+  return isNaN(n) ? 0 : n;
 }
 
 function putWorkout(d) {
