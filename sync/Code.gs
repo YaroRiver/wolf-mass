@@ -23,6 +23,12 @@ const TABS = {
 };
 const START = new Date(2026, 10, 23); // Mon 23 Nov 2026
 
+/** KEY: from Config.gs (SYNC_KEY, kept out of git) or from Script Properties set by setup(). */
+function getKey() {
+  if (typeof SYNC_KEY !== 'undefined' && SYNC_KEY) return SYNC_KEY;
+  return PropertiesService.getScriptProperties().getProperty('KEY');
+}
+
 function setup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   Object.keys(TABS).forEach(name => {
@@ -34,7 +40,7 @@ function setup() {
   const def = ss.getSheetByName('Sheet1') || ss.getSheetByName('Аркуш1');
   if (def && ss.getSheets().length > 1) ss.deleteSheet(def);
   const props = PropertiesService.getScriptProperties();
-  let key = props.getProperty('KEY');
+  let key = (typeof SYNC_KEY !== 'undefined' && SYNC_KEY) ? SYNC_KEY : props.getProperty('KEY');
   if (!key) { key = Utilities.getUuid().replace(/-/g, '').slice(0, 20); props.setProperty('KEY', key); }
   ScriptApp.getProjectTriggers().forEach(t => ScriptApp.deleteTrigger(t));
   ScriptApp.newTrigger('rollup').timeBased().everyDays(1).atHour(4).create();
@@ -46,7 +52,7 @@ function doPost(e) {
   lock.waitLock(20000);
   try {
     const body = JSON.parse(e.postData.contents || '{}');
-    if (body.key !== PropertiesService.getScriptProperties().getProperty('KEY')) return out({ ok: false, error: 'bad key' });
+    if (body.key !== getKey()) return out({ ok: false, error: 'bad key' });
     const d = body.data || {};
     if (body.type === 'checkin') putCheckin(d);
     else if (body.type === 'session') putSession(d);
@@ -65,7 +71,7 @@ function doPost(e) {
 }
 
 function doGet(e) {
-  if ((e.parameter || {}).key !== PropertiesService.getScriptProperties().getProperty('KEY')) return out({ ok: false, error: 'bad key' });
+  if ((e.parameter || {}).key !== getKey()) return out({ ok: false, error: 'bad key' });
   const ss = SpreadsheetApp.getActiveSpreadsheet(), res = { ok: true };
   Object.keys(TABS).forEach(name => res[name] = rows(ss.getSheetByName(name)));
   return out(res);
