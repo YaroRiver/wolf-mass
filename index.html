@@ -281,7 +281,7 @@ footer{margin-top:60px;color:var(--faint);font-size:13px}
         <label class="check"><input type="checkbox" id="b-legs"> Legs still heavy</label>
         <label class="check"><input type="checkbox" id="b-swell"> Knee swelling or limp</label>
       </div>
-      <div class="row" style="margin-top:18px"><button class="btn" id="b-save">Save check-in</button></div>
+      <div class="row" style="margin-top:18px"><button class="btn" id="b-save">Save check-in</button><button class="btn ghost" data-run="Wolf Health">Pull from Apple Watch</button></div>
       <div id="b-flags"></div>
     </div>
     <div>
@@ -644,7 +644,7 @@ function renderToday(){
   }
   const s=S[sid]; $('t-title').textContent=s.name; $('t-meta').textContent=s.tag;
   const saved=log[key]?.sets||{};
-  let h = `<div class="callout"><strong>${WEEKS[wk].p}</strong>${WEEKS[wk].n}</div>`;
+  let h = readinessCard(key) + `<div class="callout"><strong>${WEEKS[wk].p}</strong>${WEEKS[wk].n}</div>`;
   if (s.vo2){
     const g=gateState();
     h += wk<=2
@@ -687,7 +687,7 @@ function renderPlan(){
 function avg7(endIso){ const b=getBody(), e=parse(endIso), arr=[]; for(let i=0;i<7;i++){ const d=iso(new Date(e.getTime()-i*DAY)); if(b[d]?.weight) arr.push(+b[d].weight); } return avg(arr); }
 function saveBody(){
   const d=$('b-date').value||iso(new Date()), b=getBody(), num=id=>{ const v=$(id).value; return v===''?null:+v; };
-  b[d]={weight:num('b-w'),waist:num('b-waist'),sleep:num('b-sleep'),rhr:num('b-rhr'),knee:num('b-knee'),energy:num('b-en'),legsHeavy:$('b-legs').checked,swelling:$('b-swell').checked};
+  b[d]={hrv:(b[d]||{}).hrv??null,weight:num('b-w'),waist:num('b-waist'),sleep:num('b-sleep'),rhr:num('b-rhr'),knee:num('b-knee'),energy:num('b-en'),legsHeavy:$('b-legs').checked,swelling:$('b-swell').checked};
   store.set(K.body,b); push('checkin',Object.assign({date:d},b[d])); toast('Check-in saved'); renderBody(); renderNums(); renderEngine();
 }
 function bodyFlags(r){ const f=[];
@@ -766,6 +766,18 @@ function renderData(){ const log=getLog(), b=getBody(), e=store.get(K.eng,[]);
   const id=sel.value, rows=Object.keys(log).sort().reverse().filter(d=>log[d].sets?.[id]?.some(s=>s&&(s.w||s.r)));
   $('d-hist').innerHTML=`<tr><th>Date</th><th>Week</th><th>Sets</th><th>Top kg</th></tr>`+(rows.length?rows.map(d=>{ const ss=log[d].sets[id].filter(Boolean); return `<tr><td>${fmt(parse(d))}</td><td class="small">W${log[d].week}</td><td>${ss.map(s=>`${s.w??'?'} × ${s.r??'?'}`).join(', ')}</td><td class="n">${Math.max(...ss.map(s=>s.w||0))||''}</td></tr>`; }).join(''):`<tr><td colspan="4" class="small">No sets logged for this exercise yet.</td></tr>`); }
 
+/* readiness */
+function readinessCard(day){
+  const b=getBody(), r=b[day]||{}, prev=Object.keys(b).filter(d=>d<day).sort().slice(-7).map(d=>b[d]);
+  const base=k=>avg(prev.map(x=>x[k]));
+  const sl=r.sleep, rh=r.rhr, hv=r.hrv, bS=base('sleep'), bR=base('rhr'), bH=base('hrv');
+  const flags=[]; if(sl!=null&&sl<6.5) flags.push('sleep under 6.5 h'); if(rh!=null&&bR!=null&&rh>=bR+5) flags.push('resting HR up 5'); if(hv!=null&&bH!=null&&hv<=bH*0.85) flags.push('HRV 15% under your week');
+  const cell=(v,u,bv,d)=>`<div><b>${v==null?'—':v}</b><span>${u}${bv!=null?`, week ${bv.toFixed(d)}`:''}</span></div>`;
+  const verdict = sl==null&&rh==null&&hv==null ? 'No Apple Watch data for today yet.' : flags.length>=2 ? `${flags.length} warning signs (${flags.join(', ')}): cut sets by 30%, keep the loads.` : flags.length ? `One warning sign (${flags[0]}): train as written, watch the stop conditions.` : 'Green: train as written.';
+  return `<div class="callout ${flags.length>=2?'warn':flags.length?'':'good'}"><strong>Readiness</strong><div class="hist-grid" style="margin:8px 0 10px">${cell(sl,'h sleep',bS,1)}${cell(rh,'resting HR',bR,0)}${cell(hv,'HRV',bH,0)}</div>${verdict}<div class="row" style="margin-top:10px"><button class="btn ghost" data-run="Wolf Health">Pull readiness from Apple Watch</button></div></div>`;
+}
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-run]'); if(!b) return; location.href='shortcuts://run-shortcut?name='+encodeURIComponent(b.dataset.run); });
+
 /* sync */
 const KS={cfg:'wm.sync.v1',q:'wm.queue.v1'};
 const cfg=()=>store.get(KS.cfg,{});
@@ -777,7 +789,7 @@ function push(type,data){ if(!cfg().url) return; const q=store.get(KS.q,[]).filt
 async function getSheet(){ const c=cfg(); if(!c.url) throw new Error('Sheet sync is not set up yet. Open Data and paste the Web app URL and key.'); const r=await fetch(c.url+(c.url.includes('?')?'&':'?')+'key='+encodeURIComponent(c.key)); const j=await r.json(); if(!j.ok) throw new Error(j.error); return j; }
 async function pull(){ const j=await getSheet(); const b=getBody(), log=getLog(); let n=0;
   (j.CheckIns||[]).forEach(r=>{ if(!b[r.date]){ b[r.date]={weight:num(r.weight),waist:num(r.waist),sleep:num(r.sleep),rhr:num(r.rhr),knee:num(r.knee),energy:num(r.energy),legsHeavy:r.legsHeavy===true||r.legsHeavy==='TRUE',swelling:r.swelling===true||r.swelling==='TRUE'}; n++; } });
-  (j.Health||[]).forEach(r=>{ const x=b[r.date]||(b[r.date]={}); if(x.sleep==null&&r.sleepHours!=='') { x.sleep=num(r.sleepHours); n++; } if(x.rhr==null&&r.rhr!=='') x.rhr=num(r.rhr); if(r.hrv!=='') x.hrv=num(r.hrv); });
+  (j.Health||[]).forEach(r=>{ const x=b[r.date]||(b[r.date]={}); if(r.sleepHours!==''&&x.sleep!==num(r.sleepHours)){ x.sleep=num(r.sleepHours); n++; } if(r.rhr!=='') x.rhr=num(r.rhr); if(r.hrv!=='') x.hrv=num(r.hrv); });
   (j.Sessions||[]).forEach(s=>{ if(!log[s.date]){ const sets={}; (j.Sets||[]).filter(x=>x.date===s.date).forEach(x=>{ (sets[x.exerciseId]=sets[x.exerciseId]||[])[x.set-1]= x.text?{t:x.text}:{w:num(x.kg),r:num(x.reps)}; }); log[s.date]={session:s.session,week:+s.week,sets,notes:s.notes}; n++; } });
   const e=store.get(K.eng,[]); (j.Engine||[]).forEach(r=>{ if(!e.some(x=>x.date===r.date)){ e.push({date:r.date,w:[r.w1,r.w2,r.w3,r.w4,r.w5].map(num).filter(Boolean),rpe:num(r.rpe),hr:num(r.peakHr)}); n++; } });
   store.set(K.body,b); store.set(K.log,log); store.set(K.eng,e.sort((a,c)=>a.date<c.date?-1:1)); return {n,j}; }
@@ -823,7 +835,7 @@ $('s-push').onclick=async()=>{ try{ await post({type:'bulk',data:{body:getBody()
 $('s-pull').onclick=async()=>{ try{ const r=await pull(); $('s-msg').textContent=`Pulled ${r.n} new entries from the Sheet.`; renderNums(); renderData(); }catch(e){ $('s-msg').textContent='Pull failed: '+e.message; } };
 $('h-refresh').onclick=renderHistory;
 renderHero(); renderNums(); renderToday(); syncBadge(); flush();
-if (cfg().url) pull().then(()=>{ renderNums(); }).catch(()=>{});
+if (cfg().url) pull().then(()=>{ renderNums(); renderToday(); if($('p-body').classList.contains('on')) renderBody(); }).catch(()=>{});
 </script>
 </body>
 </html>

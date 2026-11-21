@@ -53,7 +53,7 @@ Shortcuts app → **+** → name it **Wolf Health**. Add these actions in order:
    - `data` (Dictionary) → `date`: Day · `sleepHours`: Sleep · `rhr`: RHR · `hrv`: HRV · `source`: `shortcut`
 10. **Get Contents of URL** — URL: your Web app URL · Method: **POST** · Request Body: **File** → the Dictionary.
     (If File is not offered, choose **JSON** and add the same three keys.)
-11. Optional: **Show Result** while testing; remove it afterwards.
+11. **Open URLs** — `https://yaroriver.github.io/wolf-mass/` so a run started from the site's *Pull from Apple Watch* button lands back in the app with today's readiness filled in. (For the morning automation this simply opens the app; delete the step there if you prefer it silent.)
 
 Run it once by hand and check the `Health` tab.
 
