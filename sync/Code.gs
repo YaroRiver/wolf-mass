@@ -99,21 +99,28 @@ function putEngine(d) {
   upsert('Engine', d.date, [d.date, weekOf(d.date), w[0] || '', w[1] || '', w[2] || '', w[3] || '', w[4] || '', round(avg, 0), round(spread, 1), d.rpe || '', d.hr || '', now()]);
 }
 function putHealth(d) {
-  const date = d.date || ds(new Date());
+  const date = String(d.date || ds(new Date())).trim();
   const sleep = d.sleepRaw ? sleepFromRaw(d.sleepRaw) : num(d.sleepHours);
-  upsert('Health', date, [date, weekOf(date), sleep, num(d.rhr), num(d.hrv), d.source || 'shortcut', now()]);
+  upsert('Health', date, [date, weekOf(date), sleep, round(num(d.rhr), 0), round(num(d.hrv), 1), d.source || 'shortcut', now()]);
 }
 
-/** sleepRaw: one line per Health sample, "<stage>;<duration>". Awake and In Bed are skipped. */
+/**
+ * sleepRaw: one line per Health sample, "<stage>;<duration>" or "<stage><duration>".
+ * Awake and In Bed are skipped. When stage samples (Core, Deep, REM) exist, generic
+ * "Asleep" samples are skipped too: they come from other sources and duplicate the stages.
+ */
 function sleepFromRaw(raw) {
-  let sec = 0;
+  const items = [];
   String(raw).split(/\r?\n/).forEach(line => {
     let stage, dur;
     if (line.indexOf(';') >= 0) { const p = line.split(';'); stage = p[0]; dur = p.slice(1).join(';'); }
     else { const m = String(line).match(/^([^\d]*)(\d.*)$/); if (!m) return; stage = m[1]; dur = m[2]; }
+    stage = String(stage).trim();
     if (/awake|in ?bed/i.test(stage)) return;
-    sec += durSec(dur);
+    items.push({ stage: stage, sec: durSec(dur) });
   });
+  const staged = items.some(x => /core|deep|rem/i.test(x.stage));
+  const sec = items.filter(x => !staged || /core|deep|rem/i.test(x.stage)).reduce((a, x) => a + x.sec, 0);
   return sec ? Math.round(sec / 360) / 10 : '';
 }
 function durSec(t) {
