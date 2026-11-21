@@ -24,6 +24,17 @@ Claude and ChatGPT read and write it through their Google Sheets / Drive connect
 
 If you change `Code.gs` later: **Deploy → Manage deployments → edit (pencil) → Version: New version → Deploy**. The URL stays the same.
 
+### Alternative: deploy with clasp (CLI)
+
+```bash
+cd sync
+clasp create --title "Wolf Mass Sync" --parentId <SHEET_ID> --rootDir .
+```
+
+Do not add `--type sheets`: clasp 3.4.1 then ignores `--parentId` and creates a new, empty spreadsheet.
+`clasp create` overwrites `appsscript.json`; restore it with `git checkout sync/appsscript.json` before `clasp push -f`.
+Put the key in `sync/Config.gs` (`const SYNC_KEY = '...';`, git-ignored), run `setup` once in the editor, then `clasp deploy`.
+
 ## 2. iPhone Shortcut: sleep, resting HR, HRV every morning
 
 Shortcuts app → **+** → name it **Wolf Health**. Add these actions in order:
