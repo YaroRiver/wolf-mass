@@ -19,9 +19,10 @@
 | **Engine** | Wednesday VO2 gate (2 of 3 rule), BikeErg 4×4 log with spread check and next-week call |
 | **Fuel** | Macro targets by phase, workday meal template |
 | **Rules** | Knee hard rule, illness, training and recovery rules |
-| **Data** | Export JSON / CSV, import, lift history per exercise |
+| **History** | Lived history: every week from the Google Sheet — weight, sleep, HR, HRV, knee, best sets, calorie call |
+| **Data** | Google Sheet sync settings, copy/export, import, lift history per exercise |
 
-Data is stored in the browser (localStorage). Export weekly and commit to `logs/`.
+Every Save goes to the Google Sheet **Wolf Mass Data** (see `sync/SETUP.md`), with an offline queue on the device. Claude and ChatGPT read and write the Sheet.
 
 ## Structure
 

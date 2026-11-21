@@ -175,6 +175,15 @@ ul.rules li{padding:10px 0;border-top:1px solid var(--line);font-size:15.5px;max
 .toast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,10px);background:var(--chalk);color:var(--slate);font-weight:700;padding:11px 18px;border-radius:999px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:30}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 footer{margin-top:60px;color:var(--faint);font-size:13px}
+.sync{display:inline-block;margin-left:10px;font-size:13px;padding:2px 9px;border-radius:999px;background:var(--slate-3);color:var(--dust)}
+.sync.ok{background:rgba(62,154,98,.18);color:#7fcf9c}.sync.wait{background:rgba(226,178,58,.18);color:#e8c66a}.sync.off{display:none}
+.hist-week{padding:16px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:90px 1fr;gap:16px}
+.hist-week .w{font:900 34px var(--display);line-height:1}
+.hist-week .d{font-size:13px;color:var(--faint)}
+.hist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px 18px}
+.hist-grid div b{display:block;font:800 22px var(--display);font-variant-numeric:tabular-nums}
+.hist-grid div span{font-size:13px;color:var(--dust)}
+@media(max-width:640px){.hist-week{grid-template-columns:1fr;gap:10px}.hist-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
@@ -182,7 +191,7 @@ footer{margin-top:60px;color:var(--faint);font-size:13px}
 
 <header class="top">
   <div class="mark">Wolf <span>Mass</span></div>
-  <div class="today-date" id="todayDate"></div>
+  <div class="today-date"><span id="todayDate"></span> <span id="syncState" class="sync"></span></div>
 </header>
 
 <section class="hero" aria-labelledby="heroTitle">
@@ -202,6 +211,7 @@ footer{margin-top:60px;color:var(--faint);font-size:13px}
   <button role="tab" aria-selected="false" data-p="engine">Engine</button>
   <button role="tab" aria-selected="false" data-p="fuel">Fuel</button>
   <button role="tab" aria-selected="false" data-p="rules">Rules</button>
+  <button role="tab" aria-selected="false" data-p="history">History</button>
   <button role="tab" aria-selected="false" data-p="data">Data</button>
 </nav>
 
@@ -405,8 +415,31 @@ footer{margin-top:60px;color:var(--faint);font-size:13px}
   </div>
 </section>
 
+<!-- HISTORY -->
+<section class="pane" id="p-history">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div><h2>Lived history</h2><p class="lead">Every week of the block from the Google Sheet: weight, sleep, heart, knee, best sets and the calorie call.</p></div>
+    <button class="btn ghost" id="h-refresh">Refresh from Sheet</button>
+  </div>
+  <div id="h-body" style="margin-top:18px"></div>
+  <div class="sec"><h2>Last 14 mornings</h2><div class="scroll"><table id="h-days" style="margin-top:12px"></table></div></div>
+</section>
+
 <!-- DATA -->
 <section class="pane" id="p-data">
+  <h2>Google Sheet sync</h2>
+  <p class="lead">Every Save also goes to your Wolf Mass Data sheet, where Claude and ChatGPT can read it. Paste the Web app URL and key from the Apps Script setup once on each device.</p>
+  <div class="row" style="margin-top:14px">
+    <div style="flex:1;min-width:240px"><label class="f" for="s-url">Web app URL</label><input class="f" style="width:100%" id="s-url" placeholder="https://script.google.com/macros/s/.../exec"></div>
+    <div><label class="f" for="s-key">Key</label><input class="f" style="width:200px" id="s-key"></div>
+  </div>
+  <div class="row" style="margin-top:12px">
+    <button class="btn" id="s-save">Save and test</button>
+    <button class="btn ghost" id="s-push">Send everything on this device</button>
+    <button class="btn ghost" id="s-pull">Pull from Sheet</button>
+  </div>
+  <p class="small" id="s-msg" style="margin-top:10px"></p>
+  <div class="sec"></div>
   <h2>Your data</h2>
   <p class="lead">Everything you log stays in this browser on this device. Copy it out once a week and save it to logs/ in the repo so Claude can read it on Sunday.</p>
   <div class="row" style="margin-top:16px">
@@ -636,7 +669,7 @@ function saveSession(key,sid){
   const log=getLog(), sets={};
   document.querySelectorAll('#t-body input[data-ex]').forEach(inp=>{ const e=inp.dataset.ex,i=+inp.dataset.i,f=inp.dataset.f; sets[e]=sets[e]||[]; sets[e][i]=sets[e][i]||{}; if(inp.value!=='') sets[e][i][f]=f==='t'?inp.value:+inp.value; });
   log[key]={session:sid,week:weekOf(parse(key)),sets,notes:$('t-notes').value,saved:new Date().toISOString()};
-  store.set(K.log,log); toast('Session saved'); renderNums(); renderToday();
+  store.set(K.log,log); push('session',Object.assign({date:key,names:allEx()},log[key])); toast('Session saved'); renderNums(); renderToday();
 }
 
 /* plan */
@@ -654,7 +687,7 @@ function avg7(endIso){ const b=getBody(), e=parse(endIso), arr=[]; for(let i=0;i
 function saveBody(){
   const d=$('b-date').value||iso(new Date()), b=getBody(), num=id=>{ const v=$(id).value; return v===''?null:+v; };
   b[d]={weight:num('b-w'),waist:num('b-waist'),sleep:num('b-sleep'),rhr:num('b-rhr'),knee:num('b-knee'),energy:num('b-en'),legsHeavy:$('b-legs').checked,swelling:$('b-swell').checked};
-  store.set(K.body,b); toast('Check-in saved'); renderBody(); renderNums(); renderEngine();
+  store.set(K.body,b); push('checkin',Object.assign({date:d},b[d])); toast('Check-in saved'); renderBody(); renderNums(); renderEngine();
 }
 function bodyFlags(r){ const f=[];
   if (r.swelling) f.push('<div class="callout warn"><strong>Knee swelling or limp</strong>Review this week\'s leg load. If it comes back, see the sports physio.</div>');
@@ -714,7 +747,7 @@ function renderEngine(){
 }
 function saveEngine(){ const w=[1,2,3,4,5].map(i=>+$('e-'+i).value||0).filter(Boolean); if(!w.length) return toast('Enter the watts first');
   const r={date:$('e-date').value||iso(new Date()),w,rpe:+$('e-rpe').value||null,hr:+$('e-hr').value||null};
-  const e=store.get(K.eng,[]).filter(x=>x.date!==r.date); e.push(r); e.sort((a,b)=>a.date<b.date?-1:1); store.set(K.eng,e);
+  const e=store.get(K.eng,[]).filter(x=>x.date!==r.date); e.push(r); e.sort((a,b)=>a.date<b.date?-1:1); store.set(K.eng,e); push('engine',r);
   const v=engVerdict(r); $('e-verdict').innerHTML=`<div class="callout good"><strong>${v.avg.toFixed(0)} W average, ${v.spread.toFixed(1)}% spread</strong>${v.txt}.</div>`; renderEngine(); toast('Intervals saved'); }
 
 /* fuel */
@@ -732,10 +765,39 @@ function renderData(){ const log=getLog(), b=getBody(), e=store.get(K.eng,[]);
   const id=sel.value, rows=Object.keys(log).sort().reverse().filter(d=>log[d].sets?.[id]?.some(s=>s&&(s.w||s.r)));
   $('d-hist').innerHTML=`<tr><th>Date</th><th>Week</th><th>Sets</th><th>Top kg</th></tr>`+(rows.length?rows.map(d=>{ const ss=log[d].sets[id].filter(Boolean); return `<tr><td>${fmt(parse(d))}</td><td class="small">W${log[d].week}</td><td>${ss.map(s=>`${s.w??'?'} × ${s.r??'?'}`).join(', ')}</td><td class="n">${Math.max(...ss.map(s=>s.w||0))||''}</td></tr>`; }).join(''):`<tr><td colspan="4" class="small">No sets logged for this exercise yet.</td></tr>`); }
 
+/* sync */
+const KS={cfg:'wm.sync.v1',q:'wm.queue.v1'};
+const cfg=()=>store.get(KS.cfg,{});
+function syncBadge(){ const c=cfg(), q=store.get(KS.q,[]), el=$('syncState'); if(!c.url){ el.className='sync off'; return; } el.className='sync '+(q.length?'wait':'ok'); el.textContent=q.length?`${q.length} waiting to sync`:'Synced'; }
+async function post(item){ const c=cfg(); const r=await fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:c.key,type:item.type,data:item.data})}); const j=await r.json(); if(!j.ok) throw new Error(j.error||'sync failed'); return j; }
+async function flush(){ const c=cfg(); if(!c.url) return syncBadge(); let q=store.get(KS.q,[]);
+  while(q.length){ try{ await post(q[0]); q.shift(); store.set(KS.q,q); }catch(e){ break; } } syncBadge(); }
+function push(type,data){ if(!cfg().url) return; const q=store.get(KS.q,[]).filter(x=>!(x.type===type&&x.data.date===data.date)); q.push({type,data}); store.set(KS.q,q); syncBadge(); flush(); }
+async function getSheet(){ const c=cfg(); if(!c.url) throw new Error('Sheet sync is not set up yet. Open Data and paste the Web app URL and key.'); const r=await fetch(c.url+(c.url.includes('?')?'&':'?')+'key='+encodeURIComponent(c.key)); const j=await r.json(); if(!j.ok) throw new Error(j.error); return j; }
+async function pull(){ const j=await getSheet(); const b=getBody(), log=getLog(); let n=0;
+  (j.CheckIns||[]).forEach(r=>{ if(!b[r.date]){ b[r.date]={weight:num(r.weight),waist:num(r.waist),sleep:num(r.sleep),rhr:num(r.rhr),knee:num(r.knee),energy:num(r.energy),legsHeavy:r.legsHeavy===true||r.legsHeavy==='TRUE',swelling:r.swelling===true||r.swelling==='TRUE'}; n++; } });
+  (j.Health||[]).forEach(r=>{ const x=b[r.date]||(b[r.date]={}); if(x.sleep==null&&r.sleepHours!=='') { x.sleep=num(r.sleepHours); n++; } if(x.rhr==null&&r.rhr!=='') x.rhr=num(r.rhr); if(r.hrv!=='') x.hrv=num(r.hrv); });
+  (j.Sessions||[]).forEach(s=>{ if(!log[s.date]){ const sets={}; (j.Sets||[]).filter(x=>x.date===s.date).forEach(x=>{ (sets[x.exerciseId]=sets[x.exerciseId]||[])[x.set-1]= x.text?{t:x.text}:{w:num(x.kg),r:num(x.reps)}; }); log[s.date]={session:s.session,week:+s.week,sets,notes:s.notes}; n++; } });
+  const e=store.get(K.eng,[]); (j.Engine||[]).forEach(r=>{ if(!e.some(x=>x.date===r.date)){ e.push({date:r.date,w:[r.w1,r.w2,r.w3,r.w4,r.w5].map(num).filter(Boolean),rpe:num(r.rpe),hr:num(r.peakHr)}); n++; } });
+  store.set(K.body,b); store.set(K.log,log); store.set(K.eng,e.sort((a,c)=>a.date<c.date?-1:1)); return {n,j}; }
+const num=x=>x===''||x==null||isNaN(+x)?null:+x;
+async function renderHistory(){ const hb=$('h-body'); hb.innerHTML='<p class="small">Loading from the Sheet…</p>';
+  try{ const j=await getSheet(); const W=(j.Weekly||[]).slice().reverse();
+    hb.innerHTML = W.length? W.map(r=>`<div class="hist-week"><div><div class="w">W${r.week}</div><div class="d">${fmt(parse(r.start))} to ${fmt(parse(r.end))}</div></div><div class="hist-grid">
+      <div><b>${r.avgWeight||'—'}</b><span>kg, average</span></div><div><b>${r.rateKg===''?'—':(r.rateKg>0?'+':'')+r.rateKg}</b><span>kg vs last week</span></div>
+      <div><b>${r.avgSleep||'—'}</b><span>h sleep</span></div><div><b>${r.avgRhr||'—'}</b><span>resting HR</span></div><div><b>${r.avgHrv||'—'}</b><span>HRV</span></div>
+      <div><b>${r.kneeMax}</b><span>knee, worst day</span></div><div><b>${r.sessions}</b><span>sessions</span></div>
+      <div><b>${r.benchTop||'—'}</b><span>bench, best</span></div><div><b>${r.pullupTop?'+'+r.pullupTop:'—'}</b><span>pull-up, best</span></div><div><b>${r.bikeAvgW||'—'}</b><span>BikeErg W</span></div>
+      <div><b style="font-size:17px">${r.calorieCall||'—'}</b><span>calorie call</span></div></div></div>`).join('') : '<p class="small">The Sheet is connected and empty. Your first check-in or session starts the history.</p>';
+    const days={}; (j.CheckIns||[]).forEach(r=>days[r.date]=Object.assign(days[r.date]||{},r)); (j.Health||[]).forEach(r=>days[r.date]=Object.assign(days[r.date]||{},{hs:r.sleepHours,hr2:r.rhr,hrv:r.hrv}));
+    const ks=Object.keys(days).sort().reverse().slice(0,14);
+    $('h-days').innerHTML=`<tr><th>Date</th><th>Kg</th><th>Sleep</th><th>HR</th><th>HRV</th><th>Knee</th></tr>`+(ks.length?ks.map(k=>{ const d=days[k]; return `<tr><td>${fmt(parse(k))}</td><td class="n">${d.weight||''}</td><td>${d.hs||d.sleep||''}</td><td>${d.hr2||d.rhr||''}</td><td>${d.hrv||''}</td><td>${d.knee===''||d.knee==null?'':d.knee}</td></tr>`; }).join(''):`<tr><td colspan="6" class="small">No mornings yet.</td></tr>`);
+  }catch(e){ hb.innerHTML=`<div class="callout warn"><strong>History needs the Sheet</strong>${e.message}</div>`; $('h-days').innerHTML=''; } }
+
 /* ui */
 function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('on'),1700); }
 function openTab(p){ document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p===p)); document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));
-  ({today:renderToday,plan:renderPlan,body:renderBody,engine:renderEngine,fuel:renderFuel,data:renderData}[p]||(()=>{}))(); }
+  ({today:renderToday,plan:renderPlan,body:renderBody,engine:renderEngine,fuel:renderFuel,history:renderHistory,data:renderData}[p]||(()=>{}))(); }
 document.querySelector('nav.tabs').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) openTab(b.dataset.p); });
 $('t-days').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; selDate=parse(b.dataset.d); renderToday(); });
 $('t-week').addEventListener('change',e=>{ const dow=(selDate.getDay()+6)%7; selDate=new Date(START.getTime()+((+e.target.value-1)*7+dow)*DAY); renderToday(); });
@@ -754,7 +816,13 @@ $('d-clr').onclick=()=>{ const b=$('d-clr'); if(b.dataset.arm){ store.set(K.log,
 
 $('b-date').value=iso(new Date()); $('e-date').value=iso(new Date());
 if (weekOf(selDate)<1) selDate=new Date(START);
-renderHero(); renderNums(); renderToday();
+$('s-url').value=cfg().url||''; $('s-key').value=cfg().key||'';
+$('s-save').onclick=async()=>{ store.set(KS.cfg,{url:$('s-url').value.trim(),key:$('s-key').value.trim()}); $('s-msg').textContent='Testing…'; try{ await getSheet(); $('s-msg').textContent='Connected. New saves now go to the Sheet.'; flush(); }catch(e){ $('s-msg').textContent='Not connected: '+e.message; } syncBadge(); };
+$('s-push').onclick=async()=>{ try{ await post({type:'bulk',data:{body:getBody(),log:Object.fromEntries(Object.entries(getLog()).map(([d,l])=>[d,Object.assign({names:allEx()},l)])),engine:store.get(K.eng,[])}}); $('s-msg').textContent='Everything on this device is now in the Sheet.'; }catch(e){ $('s-msg').textContent='Send failed: '+e.message; } };
+$('s-pull').onclick=async()=>{ try{ const r=await pull(); $('s-msg').textContent=`Pulled ${r.n} new entries from the Sheet.`; renderNums(); renderData(); }catch(e){ $('s-msg').textContent='Pull failed: '+e.message; } };
+$('h-refresh').onclick=renderHistory;
+renderHero(); renderNums(); renderToday(); syncBadge(); flush();
+if (cfg().url) pull().then(()=>{ renderNums(); }).catch(()=>{});
 </script>
 </body>
 </html>

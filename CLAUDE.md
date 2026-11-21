@@ -44,9 +44,15 @@ TIME ANCHOR
 - Health red lines live in the private program doc, outside this public repo.
 - Illness: fever or below-neck symptoms → full rest until 24 h fever-free.
 
+## DATA HUB
+
+Google Sheet **Wolf Mass Data** — id `1kK2FFrEeDz7D7r303ZARf8-7qejg9pUuKLIpB6qM14A`.
+Tabs: CheckIns, Sessions, Sets, Engine, Health (Apple Watch via iPhone Shortcut), Weekly (rebuilt by Apps Script).
+The app writes every Save there. Setup and Shortcut: `sync/SETUP.md`. Endpoint code: `sync/Code.gs`.
+
 ## SUNDAY CLOSE-OUT
 
-1. Read the newest export in `logs/` (JSON from the app).
+1. Read the Sheet: `Weekly`, plus `CheckIns`, `Health`, `Sets`, `Engine` for the week (fallback: newest export in `logs/`).
 2. Compute: 7-day weight average, weekly rate, waist trend over 2 weeks, sessions done vs planned, top set per key lift, BikeErg average watts and spread.
 3. Calorie call (from W3): rate < 0.15 two weeks → +150 kcal · 0.2–0.35 → hold · > 0.4 or waist +1 cm / 2 wk → −150 kcal.
 4. Update `trackers/body_tracker.md`, `trackers/lifts_tracker.md`, `STATE.md`.
