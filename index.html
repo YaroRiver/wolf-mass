@@ -835,7 +835,10 @@ $('s-push').onclick=async()=>{ try{ await post({type:'bulk',data:{body:getBody()
 $('s-pull').onclick=async()=>{ try{ const r=await pull(); $('s-msg').textContent=`Pulled ${r.n} new entries from the Sheet.`; renderNums(); renderData(); }catch(e){ $('s-msg').textContent='Pull failed: '+e.message; } };
 $('h-refresh').onclick=renderHistory;
 renderHero(); renderNums(); renderToday(); syncBadge(); flush();
-if (cfg().url) pull().then(()=>{ renderNums(); renderToday(); if($('p-body').classList.contains('on')) renderBody(); }).catch(()=>{});
+function refreshFromSheet(){ if(!cfg().url) return Promise.resolve(); return pull().then(()=>{ renderNums(); renderToday(); if($('p-body').classList.contains('on')) renderBody(); }).catch(()=>{}); }
+refreshFromSheet();
+// Coming back from the Shortcuts app: pull now and again a few seconds later, so the Watch data written by the shortcut shows up.
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'){ refreshFromSheet(); setTimeout(refreshFromSheet,4000); } });
 </script>
 </body>
 </html>
