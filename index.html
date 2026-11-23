@@ -175,6 +175,7 @@ ul.rules li{padding:10px 0;border-top:1px solid var(--line);font-size:15.5px;max
 .toast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,10px);background:var(--chalk);color:var(--slate);font-weight:700;padding:11px 18px;border-radius:999px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:30}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 footer{margin-top:60px;color:var(--faint);font-size:13px}
+.rep-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid rgba(255,255,255,.08);font-size:15px}.rep-row span:last-child{text-align:right}details.edit>summary{list-style:none;display:inline-block;cursor:pointer}details.edit>summary::-webkit-details-marker{display:none}
 .sync{display:inline-block;margin-left:10px;font-size:13px;padding:2px 9px;border-radius:999px;background:var(--slate-3);color:var(--dust)}
 .sync.ok{background:rgba(62,154,98,.18);color:#7fcf9c}.sync.wait{background:rgba(226,178,58,.18);color:#e8c66a}.sync.off{display:none}
 .hist-week{padding:16px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:90px 1fr;gap:16px}
@@ -475,7 +476,7 @@ const store = {
   get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):(mem[k]??d); }catch(e){ return mem[k]??d; } },
   set(k,v){ mem[k]=v; try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
 };
-const K = { log:'wm.log.v1', body:'wm.body.v1', eng:'wm.engine.v1' };
+const K = { log:'wm.log.v1', body:'wm.body.v1', eng:'wm.engine.v1', wk:'wm.workouts.v1' };
 const $ = id => document.getElementById(id);
 
 /* calendar */
@@ -651,20 +652,34 @@ function renderToday(){
       ? `<div class="callout"><strong>BikeErg</strong>${wk===2?'One test today: 4 × 4 min at RPE 8. Log the watts in Engine; they become your baseline.':'Week 1 is the arm and delt block only, and it is optional.'}</div>`
       : `<div class="callout ${g.off?'warn':'good'}"><strong>BikeErg intervals: ${g.off?'off today':'on'}</strong>${wk>=7?(wk%2?'5 × 4 min, 3 min easy between.':'3 series of 13 × 30 s on, 15 s off, 3 min between series.'):'4 × 4 min at RPE 8, 3 min easy between, one watt target for all four.'} Warm up for 10 minutes with three 10-second pickups.</div>`;
   }
+  const done=log[key]&&Object.keys(saved).length; if(done) h += reportCard(key,s,wk,log[key]);
+  let form='';
   s.ex.forEach(ex=>{
     const p=prescribe(ex,wk), hn=hint(ex,p,key), unit=ex.unit||'';
     const rng=p.r[0]===p.r[1]?p.r[0]:`${p.r[0]}–${p.r[1]}`, sv=saved[ex.id]||[];
     let sets='';
     if (ex.rir!=='—') for (let i=0;i<p.s;i++){ const v=sv[i]||{}; sets+=`<div class="set"><span class="i">${i+1}</span><input type="number" step="0.5" inputmode="decimal" placeholder="kg" aria-label="${ex.n} set ${i+1} kg" data-ex="${ex.id}" data-i="${i}" data-f="w" value="${v.w??''}"><span class="x">×</span><input type="number" inputmode="numeric" placeholder="${unit==='m'?'m':'reps'}" aria-label="${ex.n} set ${i+1} reps" data-ex="${ex.id}" data-i="${i}" data-f="r" value="${v.r??''}"></div>`; }
     else sets=`<div class="set wide"><input type="text" placeholder="Times and notes" aria-label="${ex.n} result" data-ex="${ex.id}" data-i="0" data-f="t" value="${(sv[0]||{}).t??''}"></div>`;
-    h += `<div class="ex"><div class="ex-top"><div class="ex-n">${ex.n}</div><div class="ex-rx">${p.s} × ${rng}${unit?` ${unit}`:''}<small>RIR ${p.rir}</small></div>${(ex.load||p.note)?`<div class="ex-note">${ex.load?`<b style="color:var(--chalk)">${ex.load}.</b> `:''}${p.note}</div>`:''}${ex.rir!=='—'?`<div class="ex-hint ${hn.cls}">${hn.txt}</div>`:''}</div><div class="sets">${sets}</div></div>`;
+    form += `<div class="ex"><div class="ex-top"><div class="ex-n">${ex.n}</div><div class="ex-rx">${p.s} × ${rng}${unit?` ${unit}`:''}<small>RIR ${p.rir}</small></div>${(ex.load||p.note)?`<div class="ex-note">${ex.load?`<b style="color:var(--chalk)">${ex.load}.</b> `:''}${p.note}</div>`:''}${ex.rir!=='—'?`<div class="ex-hint ${hn.cls}">${hn.txt}</div>`:''}</div><div class="sets">${sets}</div></div>`;
   });
-  h += `<div class="callout warn"><strong>Stop condition</strong>${s.stop}</div>`;
-  if (s.knee) h += `<div class="callout warn"><strong>Knee</strong>Pain rising or the movement changing ends that exercise for today. Pain, swelling or a limp tomorrow means reviewing the week.</div>`;
-  h += `<div style="margin-top:18px"><label class="f" for="t-notes">Session notes</label><textarea id="t-notes" rows="3" placeholder="Knee, energy, anything unusual">${log[key]?.notes||''}</textarea></div><div class="row" style="margin-top:12px"><button class="btn" id="t-save">Save session</button><button class="btn ghost" id="t-watch">Pull workout from Apple Watch</button></div><p class="small" style="margin-top:8px">Runs the Wolf Workout shortcut: heart rate and active calories from the last 2 hours go to the Sheet.</p>`;
+  form += `<div class="callout warn"><strong>Stop condition</strong>${s.stop}</div>`;
+  if (s.knee) form += `<div class="callout warn"><strong>Knee</strong>Pain rising or the movement changing ends that exercise for today. Pain, swelling or a limp tomorrow means reviewing the week.</div>`;
+  form += `<div style="margin-top:18px"><label class="f" for="t-notes">Session notes</label><textarea id="t-notes" rows="3" placeholder="Knee, energy, anything unusual">${log[key]?.notes||''}</textarea></div><div class="row" style="margin-top:12px"><button class="btn" id="t-save">${done?'Save changes':'Save session'}</button></div><p class="small" style="margin-top:8px">Watch data: send a screenshot of the workout summary to Claude, and the numbers go to the Sheet.</p>`;
+  h += done ? `<details class="edit"><summary class="btn ghost" style="margin-top:14px">Edit the sets</summary>${form}</details>` : form;
   body.innerHTML=h;
   $('t-save').onclick=()=>saveSession(key,sid);
-  $('t-watch').onclick=()=>{ const inp=JSON.stringify({key:cfg().key||'',date:key,session:sid,url:cfg().url||''}); location.href='shortcuts://run-shortcut?name='+encodeURIComponent('Wolf Workout')+'&input=text&text='+encodeURIComponent(inp); };
+}
+function reportCard(key,s,wk,L){
+  const sets=L.sets||{}, wo=(store.get(K.wk,{})||{})[key];
+  let planned=0, doneN=0, kg=0; const rows=[];
+  s.ex.forEach(ex=>{ if(ex.rir==='—') return; const p=prescribe(ex,wk), sv=(sets[ex.id]||[]).filter(x=>x&&x.w!=null&&x.r!=null); planned+=p.s; doneN+=sv.length; if(!sv.length) return;
+    if((ex.unit||'')!=='m') sv.forEach(x=>kg+=x.w*x.r);
+    const best=sv.reduce((a,x)=>x.w>a.w||(x.w===a.w&&x.r>a.r)?x:a,sv[0]);
+    const top=p.r[0]!==p.r[1]&&sv.length>=p.s&&sv.every(x=>x.r>=p.r[1]);
+    rows.push(`<div class="rep-row"><span>${ex.n}</span><span>${sv.length} × ${best.w} kg × ${best.r}${ex.unit==='m'?' m':''}${top?' · <b style="color:#7fcf9c">'+(wk<=2?'top of range':'top of range: add load next time')+'</b>':''}</span></div>`); });
+  const t=L.saved?new Date(L.saved).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}):'';
+  const watch=wo?`<div class="hist-grid" style="margin:10px 0">${[[wo.min!=null?Math.round(wo.min):null,'min'],[wo.avg,'avg HR'],[wo.max,'max HR'],[wo.kcal,'active kcal']].map(([v,u])=>`<div><b>${v??'—'}</b><span>${u}</span></div>`).join('')}</div>`:`<p class="small" style="margin:8px 0">Watch numbers appear here after you send Claude the workout screenshot.</p>`;
+  return `<div class="callout good"><strong>Session saved${t?' at '+t:''}</strong><div style="margin:6px 0 2px">${doneN} of ${planned} planned sets · ${Math.round(kg).toLocaleString('en-AU')} kg moved (lunges counted separately)</div>${watch}<div class="rep">${rows.join('')}</div>${L.notes?`<p class="small" style="margin-top:8px">Notes: ${L.notes.replace(/</g,'&lt;')}</p>`:''}</div>`;
 }
 function saveSession(key,sid){
   const log=getLog(), sets={};
@@ -792,6 +807,7 @@ async function pull(){ const j=await getSheet(); const b=getBody(), log=getLog()
   (j.Health||[]).forEach(r=>{ const x=b[r.date]||(b[r.date]={}); if(r.sleepHours!==''&&x.sleep!==num(r.sleepHours)){ x.sleep=num(r.sleepHours); n++; } if(r.rhr!=='') x.rhr=num(r.rhr); if(r.hrv!=='') x.hrv=num(r.hrv); });
   (j.Sessions||[]).forEach(s=>{ if(!log[s.date]){ const sets={}; (j.Sets||[]).filter(x=>x.date===s.date).forEach(x=>{ (sets[x.exerciseId]=sets[x.exerciseId]||[])[x.set-1]= x.text?{t:x.text}:{w:num(x.kg),r:num(x.reps)}; }); log[s.date]={session:s.session,week:+s.week,sets,notes:s.notes}; n++; } });
   const e=store.get(K.eng,[]); (j.Engine||[]).forEach(r=>{ if(!e.some(x=>x.date===r.date)){ e.push({date:r.date,w:[r.w1,r.w2,r.w3,r.w4,r.w5].map(num).filter(Boolean),rpe:num(r.rpe),hr:num(r.peakHr)}); n++; } });
+  const wo={}; (j.Workouts||[]).forEach(r=>{ wo[r.date]={min:num(r.minutes),avg:num(r.avgHr),max:num(r.maxHr),kcal:num(r.activeKcal)}; }); store.set(K.wk,wo);
   store.set(K.body,b); store.set(K.log,log); store.set(K.eng,e.sort((a,c)=>a.date<c.date?-1:1)); return {n,j}; }
 const num=x=>x===''||x==null||isNaN(+x)?null:+x;
 async function renderHistory(){ const hb=$('h-body'); hb.innerHTML='<p class="small">Loading from the Sheet…</p>';
