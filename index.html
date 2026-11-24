@@ -646,7 +646,8 @@ function renderToday(){
     body.innerHTML = `<div class="callout"><strong>${WEEKS[wk].p}</strong>${WEEKS[wk].n}</div>`; return;
   }
   const s=S[sid]; $('t-title').textContent=s.name; $('t-meta').textContent=s.tag;
-  const saved=log[key]?.sets||{};
+  const saved=log[key]?.sets||{}; const draft=(store.get('wm.draft.v1',{})||{})[key]||{};
+  const dv=(e,i,f,v)=>{ const d=draft[e]&&draft[e][i]; return d&&d[f]!==undefined?d[f]:(v??''); };
   let h = readinessCard(key) + `<div class="callout"><strong>${WEEKS[wk].p}</strong>${WEEKS[wk].n}</div>`;
   if (s.vo2){
     const g=gateState();
@@ -662,8 +663,8 @@ function renderToday(){
     const p=prescribe(ex,wk), hn=hint(ex,p,key), unit=ex.unit||'';
     const rng=p.r[0]===p.r[1]?p.r[0]:`${p.r[0]}–${p.r[1]}`, sv=saved[ex.id]||[];
     let sets='';
-    if (ex.rir!=='—') for (let i=0;i<p.s;i++){ const v=sv[i]||{}; sets+=`<div class="set"><span class="i${tag?' tag':''}">${tag?tag+' ':''}${i+1}</span><input type="number" step="0.5" inputmode="decimal" placeholder="kg" aria-label="${ex.n} set ${i+1} kg" data-ex="${ex.id}" data-i="${i}" data-f="w" value="${v.w??''}"><span class="x">×</span><input type="number" inputmode="numeric" placeholder="${unit==='m'?'m':'reps'}" aria-label="${ex.n} set ${i+1} reps" data-ex="${ex.id}" data-i="${i}" data-f="r" value="${v.r??''}"></div>`; }
-    else sets=`<div class="set wide"><input type="text" placeholder="Times and notes" aria-label="${ex.n} result" data-ex="${ex.id}" data-i="0" data-f="t" value="${(sv[0]||{}).t??''}"></div>`;
+    if (ex.rir!=='—') for (let i=0;i<p.s;i++){ const v=sv[i]||{}; sets+=`<div class="set"><span class="i${tag?' tag':''}">${tag?tag+' ':''}${i+1}</span><input type="number" step="0.5" inputmode="decimal" placeholder="kg" aria-label="${ex.n} set ${i+1} kg" data-ex="${ex.id}" data-i="${i}" data-f="w" value="${dv(ex.id,i,'w',v.w)}"><span class="x">×</span><input type="number" inputmode="numeric" placeholder="${unit==='m'?'m':'reps'}" aria-label="${ex.n} set ${i+1} reps" data-ex="${ex.id}" data-i="${i}" data-f="r" value="${dv(ex.id,i,'r',v.r)}"></div>`; }
+    else sets=`<div class="set wide"><input type="text" placeholder="Times and notes" aria-label="${ex.n} result" data-ex="${ex.id}" data-i="0" data-f="t" value="${dv(ex.id,0,'t',(sv[0]||{}).t)}"></div>`;
     return {sets, rows:sets.split('</div><div class="set').map((x,i,a)=>(i?'<div class="set':'')+x+(i<a.length-1?'</div>':'')), head:`<div class="ex-top"><div class="ex-n">${ex.n}</div><div class="ex-rx">${p.s} × ${rng}${unit?` ${unit}`:''}<small>RIR ${p.rir}</small></div>${(ex.load||p.note)?`<div class="ex-note">${ex.load?`<b style="color:var(--chalk)">${ex.load}.</b> `:''}${p.note}</div>`:''}${ex.rir!=='—'?`<div class="ex-hint ${hn.cls}">${hn.txt}</div>`:''}</div>`};
   };
   s.ex.forEach(ex=>{
@@ -675,10 +676,13 @@ function renderToday(){
   });
   form += `<div class="callout warn"><strong>Stop condition</strong>${s.stop}</div>`;
   if (s.knee) form += `<div class="callout warn"><strong>Knee</strong>Pain rising or the movement changing ends that exercise for today. Pain, swelling or a limp tomorrow means reviewing the week.</div>`;
-  form += `<div style="margin-top:18px"><label class="f" for="t-notes">Session notes</label><textarea id="t-notes" rows="3" placeholder="Knee, energy, anything unusual">${log[key]?.notes||''}</textarea></div><div class="row" style="margin-top:12px"><button class="btn" id="t-save">${done?'Save changes':'Save session'}</button></div><p class="small" style="margin-top:8px">Watch data: send a screenshot of the workout summary to Claude, and the numbers go to the Sheet.</p>`;
+  form += `<div style="margin-top:18px"><label class="f" for="t-notes">Session notes</label><textarea id="t-notes" rows="3" placeholder="Knee, energy, anything unusual">${draft._notes??(log[key]?.notes||'')}</textarea></div><div class="row" style="margin-top:12px"><button class="btn" id="t-save">${done?'Save changes':'Save session'}</button></div><p class="small" style="margin-top:8px">Watch data: send a screenshot of the workout summary to Claude, and the numbers go to the Sheet.</p>`;
   h += complete ? `<details class="edit"><summary class="btn ghost" style="margin-top:14px">Edit the sets</summary>${form}</details>` : form;
   body.innerHTML=h;
   $('t-save').onclick=()=>saveSession(key,sid);
+  body.oninput=e=>{ const t=e.target, all=store.get('wm.draft.v1',{})||{}, d=all[key]||(all[key]={});
+    if(t.id==='t-notes') d._notes=t.value; else if(t.dataset&&t.dataset.ex){ const ex=t.dataset.ex,i=t.dataset.i,f=t.dataset.f; d[ex]=d[ex]||{}; d[ex][i]=d[ex][i]||{}; d[ex][i][f]=t.value; } else return;
+    store.set('wm.draft.v1',all); };
 }
 function reportCard(key,s,wk,L){
   const sets=L.sets||{}, wo=(store.get(K.wk,{})||{})[key];
@@ -696,7 +700,7 @@ function saveSession(key,sid){
   const log=getLog(), sets={};
   document.querySelectorAll('#t-body input[data-ex]').forEach(inp=>{ const e=inp.dataset.ex,i=+inp.dataset.i,f=inp.dataset.f; sets[e]=sets[e]||[]; sets[e][i]=sets[e][i]||{}; if(inp.value!=='') sets[e][i][f]=f==='t'?inp.value:+inp.value; });
   log[key]={session:sid,week:weekOf(parse(key)),sets,notes:$('t-notes').value,saved:new Date().toISOString()};
-  store.set(K.log,log); push('session',Object.assign({date:key,names:allEx()},log[key])); toast('Session saved'); renderNums(); renderToday();
+  store.set(K.log,log); { const all=store.get('wm.draft.v1',{})||{}; delete all[key]; store.set('wm.draft.v1',all); } push('session',Object.assign({date:key,names:allEx()},log[key])); toast('Session saved'); renderNums(); renderToday();
 }
 
 /* plan */
@@ -864,13 +868,13 @@ $('h-refresh').onclick=renderHistory;
 renderHero(); renderNums(); renderToday(); syncBadge(); flush();
 // Self-update: GitHub Pages caches the page for up to 10 minutes. On open and on return, fetch a fresh copy;
 // if its APP_V differs from this one, reload with a cache-busting query.
-const APP_V='2026-11-24.3';
+const APP_V='2026-11-24.4';
 function checkUpdate(){ fetch(location.pathname+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{ const m=t.match(/const APP_V='([^']+)'/); if(m&&m[1]!==APP_V){ const u=new URL(location.href); u.searchParams.set('v',m[1]); location.replace(u.toString()); } }).catch(()=>{}); }
 checkUpdate();
 // Pull down at the very top of the page to reload (works in the home-screen app too).
-(()=>{ let y0=null; addEventListener('touchstart',e=>{ y0=scrollY<=0?e.touches[0].clientY:null; },{passive:true});
-  addEventListener('touchend',e=>{ if(y0!=null&&e.changedTouches[0].clientY-y0>110&&scrollY<=0){ location.reload(); } y0=null; },{passive:true}); })();
-function refreshFromSheet(){ if(!cfg().url) return Promise.resolve(); return pull().then(()=>{ renderNums(); renderToday(); if($('p-body').classList.contains('on')) renderBody(); }).catch(()=>{}); }
+(()=>{ let y0=null; addEventListener('touchstart',e=>{ const a=document.activeElement; y0=(scrollY<=0&&!(a&&/INPUT|TEXTAREA/.test(a.tagName)))?e.touches[0].clientY:null; },{passive:true});
+  addEventListener('touchend',e=>{ if(y0!=null&&e.changedTouches[0].clientY-y0>160&&scrollY<=0){ location.reload(); } y0=null; },{passive:true}); })();
+function refreshFromSheet(){ if(!cfg().url) return Promise.resolve(); return pull().then(()=>{ renderNums(); if(!document.activeElement||!document.activeElement.closest||!document.activeElement.closest('#t-body')) renderToday(); if($('p-body').classList.contains('on')) renderBody(); }).catch(()=>{}); }
 refreshFromSheet();
 // Coming back from the Shortcuts app: pull now and again a few seconds later, so the Watch data written by the shortcut shows up.
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'){ checkUpdate(); refreshFromSheet(); setTimeout(refreshFromSheet,4000); } });
