@@ -42,6 +42,7 @@ Weekly direct sets from W3: back 13 · chest 13 (6 upper, 6 mid, 1 dips) · quad
 - Block: hammer curl 3 × 10–15 · side-lying lateral raise 3 × 12–20 / arm · cable pushdown 2 × 10–15 · cable crunch 3 × 10–15.
 
 ### Upper B (Thu)
+0. Muscle-up skill · 3 rounds · each: 3 explosive chest-to-bar pull-ups (false grip) + 2 slow negatives through the transition · warm-up, ~10 min, stop when pulls stop reaching the chest
 1. Incline DB press 30° 4 × 8–12 · 1–2 RIR · first
 2. Lat pulldown neutral 3 × 8–12 · 1 RIR (+1 set from W4)
 3. One-arm DB row 3 × 8–12 / arm · 1–2 RIR · 35 → 45 kg (+1 set W8 if recovering)

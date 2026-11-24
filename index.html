@@ -535,6 +535,7 @@ const S = {
     {id:'crunch',n:'Cable crunch',s:3,r:[10,15],rir:'1',t:'iso'}
   ]},
   upperB:{ name:'Upper B', tag:'21 sets, upper chest first', stop:'Elbow pain: one biceps set less a week, and preacher curl becomes hammer curl.', ex:[
+    {id:'muskill',n:'Muscle-up skill',s:3,r:[1,1],unit:'rounds',rir:'—',t:'main',note:'Warm-up, about 10 min, fresh and explosive. Each round: 3 explosive pull-ups to the chest (pull the bar to the lower chest, false grip) + 2 slow negatives: jump to the top support, lower through the transition in 3–5 s. 2 min rest. Stop when a pull no longer reaches the chest.'},
     {id:'incdb',n:'Incline DB press, 30°',s:4,r:[8,12],rir:'1–2',t:'main',note:'First, while you are fresh. Upper chest.'},
     {id:'pulldn',n:'Lat pulldown, neutral grip',s:3,r:[8,12],rir:'1',t:'main',inc:{4:1},note:'Full stretch at the top.'},
     {id:'oarow',n:'One-arm DB row',s:3,r:[8,12],rir:'1–2',t:'main',load:'35 kg',inc:{8:1},note:'Reps per arm. Target 45 kg.'},
@@ -863,7 +864,7 @@ $('h-refresh').onclick=renderHistory;
 renderHero(); renderNums(); renderToday(); syncBadge(); flush();
 // Self-update: GitHub Pages caches the page for up to 10 minutes. On open and on return, fetch a fresh copy;
 // if its APP_V differs from this one, reload with a cache-busting query.
-const APP_V='2026-11-24.2';
+const APP_V='2026-11-24.3';
 function checkUpdate(){ fetch(location.pathname+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{ const m=t.match(/const APP_V='([^']+)'/); if(m&&m[1]!==APP_V){ const u=new URL(location.href); u.searchParams.set('v',m[1]); location.replace(u.toString()); } }).catch(()=>{}); }
 checkUpdate();
 // Pull down at the very top of the page to reload (works in the home-screen app too).
