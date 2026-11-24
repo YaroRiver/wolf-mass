@@ -31,7 +31,7 @@ Weekly direct sets from W3: back 13 · chest 13 (6 upper, 6 mid, 1 dips) · quad
 2. Lateral raise, standing DB, 4 × 12–20 · 0–1 RIR · between bench sets
 3. Weighted pull-up 4 × 5–8 · 1–2 RIR · +20 kg (+1 set from W4)
 4. Chest-supported row 3 × 8–12 · 1–2 RIR (+1 set W8 if recovering)
-5. Low-to-high cable fly 2 × 12–15 · 1 RIR
+5. Incline DB fly 30° 2 × 10–15 · 1 RIR (landmine press as a swap)
 6. EZ preacher curl 3 × 8–12 + overhead cable triceps extension 3 × 8–12 (superset) · 1 RIR (extension +1 set W7)
 
 ### Engine (Wed)

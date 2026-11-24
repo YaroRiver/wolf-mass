@@ -524,7 +524,7 @@ const S = {
     {id:'latA',n:'Lateral raise',sn:'Lateral',s:4,r:[12,20],rir:'0–1',t:'iso',note:'Standing dumbbells, one set in the rest after each bench set. Elbows lead, stop at shoulder height.'},
     {id:'pullup',n:'Weighted pull-up',s:4,r:[5,8],rir:'1–2',t:'main',load:'+20 kg',inc:{4:1},note:'Clean reps only. Target +25 kg for 6.'},
     {id:'csrow',n:'Chest-supported row',s:3,r:[8,12],rir:'1–2',t:'main',inc:{8:1},note:'Mid back with the spine unloaded.'},
-    {id:'lthfly',n:'Low-to-high cable fly',s:2,r:[12,15],rir:'1',t:'iso',note:'Upper chest.'},
+    {id:'lthfly',n:'Incline DB fly, 30°',s:2,r:[10,15],rir:'1',t:'iso',note:'Upper chest. Slight elbow bend, lower slowly into a deep stretch, bring the dumbbells up and slightly inward. Landmine press works as a swap.'},
     {id:'ezcurl',n:'EZ preacher curl',ss:'ohext',sn:'Curl',s:3,r:[8,12],rir:'1',t:'arm',note:'Superset with the overhead extension.'},
     {id:'ohext',n:'Overhead cable triceps extension',sn:'Triceps',s:3,r:[8,12],rir:'1',t:'iso',inc:{7:1},note:'The main triceps builder.'}
   ]},
@@ -868,7 +868,7 @@ $('h-refresh').onclick=renderHistory;
 renderHero(); renderNums(); renderToday(); syncBadge(); flush();
 // Self-update: GitHub Pages caches the page for up to 10 minutes. On open and on return, fetch a fresh copy;
 // if its APP_V differs from this one, reload with a cache-busting query.
-const APP_V='2026-11-24.4';
+const APP_V='2026-11-24.5';
 function checkUpdate(){ fetch(location.pathname+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{ const m=t.match(/const APP_V='([^']+)'/); if(m&&m[1]!==APP_V){ const u=new URL(location.href); u.searchParams.set('v',m[1]); location.replace(u.toString()); } }).catch(()=>{}); }
 checkUpdate();
 // Pull down at the very top of the page to reload (works in the home-screen app too).
