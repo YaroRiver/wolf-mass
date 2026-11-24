@@ -13,3 +13,4 @@
 | Single hard constraint | Knee: rising pain or changed mechanics stops the exercise; next-day pain, swelling or limp → review load; physio before running progression |
 
 Philosophy: Strength + Hypertrophy First · HYROX Conditioning Second · Running Rehabilitation Third.
+- 2026-11-24: Wed and Thu lateral raises become side-lying on a 30–45° incline bench (Yaro's preferred variation; load peaks with the delt stretched). Tue stays standing DB between bench sets for time.

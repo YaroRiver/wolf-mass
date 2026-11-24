@@ -28,7 +28,7 @@ Weekly direct sets from W3: back 13 · chest 13 (6 upper, 6 mid, 1 dips) · quad
 
 ### Upper A (Tue)
 1. Bench press 4 × 5–8 · 1–2 RIR · 80 kg (W9+: 3 × 6–10 + back-off −10%)
-2. Lateral raise 4 × 12–20 · 0–1 RIR · between bench sets
+2. Lateral raise, standing DB, 4 × 12–20 · 0–1 RIR · between bench sets
 3. Weighted pull-up 4 × 5–8 · 1–2 RIR · +20 kg (+1 set from W4)
 4. Chest-supported row 3 × 8–12 · 1–2 RIR (+1 set W8 if recovering)
 5. Low-to-high cable fly 2 × 12–15 · 1 RIR
@@ -39,7 +39,7 @@ Weekly direct sets from W3: back 13 · chest 13 (6 upper, 6 mid, 1 dips) · quad
 - W3–W5: 4 × 4 min BikeErg at RPE 8, 3 min easy, one watt target, spread ≤ 3%.
 - W7–W11: odd weeks 5 × 4 min · even weeks 3 × 13 × 30/15 s.
 - Gate from W3: VO2 drops when 2 of 3 hit — sleep < 6.5 h · RHR +5 vs 14-day · legs heavy after Monday.
-- Block: hammer curl 3 × 10–15 · lateral raise 3 × 15–20 · cable pushdown 2 × 10–15 · cable crunch 3 × 10–15.
+- Block: hammer curl 3 × 10–15 · side-lying lateral raise 3 × 12–20 / arm · cable pushdown 2 × 10–15 · cable crunch 3 × 10–15.
 
 ### Upper B (Thu)
 1. Incline DB press 30° 4 × 8–12 · 1–2 RIR · first
@@ -47,7 +47,7 @@ Weekly direct sets from W3: back 13 · chest 13 (6 upper, 6 mid, 1 dips) · quad
 3. One-arm DB row 3 × 8–12 / arm · 1–2 RIR · 35 → 45 kg (+1 set W8 if recovering)
 4. Cable fly / pec deck 2 × 10–15 · 1 RIR
 5. Weighted dips 1 × 6–10 · 1–2 RIR · +20 kg
-6. Lateral raise 3 × 12–20 + reverse pec deck 2 × 12–20 (superset) · 0–1 RIR
+6. Side-lying lateral raise 3 × 12–20 / arm + reverse pec deck 2 × 12–20 (superset) · 0–1 RIR
 7. Incline DB curl 3 × 10–15 · 1 RIR (+1 set W7)
 
 ### HYROX A — Heavy Sleds (odd weeks)
