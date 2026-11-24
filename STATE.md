@@ -24,6 +24,8 @@
 
 ## Open actions
 
+- [ ] App: show supersets as one block with interleaved set rows (bench 1 → lateral 1 → bench 2…), label "Superset" on both exercises. Do after a session, never mid-workout.
+
 - [ ] Book sports physio (knee) — W1–W2
 - [ ] W1 baseline: waist, arms, chest, thigh, photos
 - [ ] W2: BikeErg 4 × 4 baseline watts
