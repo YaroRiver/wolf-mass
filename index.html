@@ -861,10 +861,18 @@ $('s-push').onclick=async()=>{ try{ await post({type:'bulk',data:{body:getBody()
 $('s-pull').onclick=async()=>{ try{ const r=await pull(); $('s-msg').textContent=`Pulled ${r.n} new entries from the Sheet.`; renderNums(); renderData(); }catch(e){ $('s-msg').textContent='Pull failed: '+e.message; } };
 $('h-refresh').onclick=renderHistory;
 renderHero(); renderNums(); renderToday(); syncBadge(); flush();
+// Self-update: GitHub Pages caches the page for up to 10 minutes. On open and on return, fetch a fresh copy;
+// if its APP_V differs from this one, reload with a cache-busting query.
+const APP_V='2026-11-24.2';
+function checkUpdate(){ fetch(location.pathname+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{ const m=t.match(/const APP_V='([^']+)'/); if(m&&m[1]!==APP_V){ const u=new URL(location.href); u.searchParams.set('v',m[1]); location.replace(u.toString()); } }).catch(()=>{}); }
+checkUpdate();
+// Pull down at the very top of the page to reload (works in the home-screen app too).
+(()=>{ let y0=null; addEventListener('touchstart',e=>{ y0=scrollY<=0?e.touches[0].clientY:null; },{passive:true});
+  addEventListener('touchend',e=>{ if(y0!=null&&e.changedTouches[0].clientY-y0>110&&scrollY<=0){ location.reload(); } y0=null; },{passive:true}); })();
 function refreshFromSheet(){ if(!cfg().url) return Promise.resolve(); return pull().then(()=>{ renderNums(); renderToday(); if($('p-body').classList.contains('on')) renderBody(); }).catch(()=>{}); }
 refreshFromSheet();
 // Coming back from the Shortcuts app: pull now and again a few seconds later, so the Watch data written by the shortcut shows up.
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'){ refreshFromSheet(); setTimeout(refreshFromSheet,4000); } });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'){ checkUpdate(); refreshFromSheet(); setTimeout(refreshFromSheet,4000); } });
 </script>
 </body>
 </html>
