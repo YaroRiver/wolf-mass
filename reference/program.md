@@ -62,7 +62,7 @@ BBJ: knee sensation on landing → BBJ over, swap 40 WB. Knee worse next morning
 
 ## Week modifiers
 
-- W1–W2: isolation −1 set, everything 3 RIR (biceps 2–3).
+- W1: isolation −1 set, everything 3 RIR. W2: full sets, RIR as written (biceps 2–3).
 - W6 and W12: deload — sets −50%, loads kept, 3–4 RIR, checks at 1 RIR only, Saturday light B without BBJ.
 - W5: Christmas Fri 25 Dec. W10: Australia Day Mon 26 Jan → Lower Tue, Upper A Wed, Engine Fri.
 

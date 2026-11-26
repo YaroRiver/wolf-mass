@@ -497,7 +497,7 @@ const PH = {
 };
 const WEEKS = {
   1:{ph:'entry',size:.62,p:'Entry, 4 sessions',n:'Everything at 3 RIR, one isolation set fewer. Check today\'s working loads. Measure waist and arms, take photos, book the physio.'},
-  2:{ph:'entry',size:.7,p:'Entry, 4–5 sessions',n:'RIR as written. One BikeErg 4 × 4 test for baseline watts. Calories around 3450 to find maintenance.'},
+  2:{ph:'entry',size:.7,p:'Full work, 4–5 sessions',n:'Full sets, RIR as written: main lifts 1–2, legs 2, isolation last set to 0–1, biceps 2–3. One BikeErg 4 × 4 test for baseline watts. Calories around 3450 to find maintenance.'},
   3:{ph:'block1',size:.86,p:'Block 1',n:'Full five-session week. Surplus starts at about 3700 kcal. Wednesday VO2 becomes the default.'},
   4:{ph:'block1',size:.9,p:'Block 1',n:'One more set of pull-ups on Tuesday and pulldowns on Thursday.'},
   5:{ph:'peak',size:.95,p:'Block 1 peak',n:'Christmas falls on Friday 25 December, so the spare day is taken; a missed session is skipped.'},
@@ -565,7 +565,7 @@ function prescribe(ex,wk){
   let s=ex.s, r=ex.r.slice(), rir=ex.rir, note=ex.note||'';
   if (ex.w9 && wk>=9 && wk!==12){ s=ex.w9.s; r=ex.w9.r; note=ex.w9.note; }
   if (ex.inc) for (const w in ex.inc) if (wk>=+w && wk!==6 && wk!==12) s+=ex.inc[w];
-  if (wk<=2){ if (ex.t!=='main' && s>1) s-=1; rir='3'; }
+  if (wk===1){ if (ex.t!=='main' && s>1) s-=1; rir='3'; }
   if (ex.t==='arm' && wk<=2) rir='2–3';
   if (ex.t==='arm' && wk>=7 && wk!==12) rir='0–1';
   if (wk===6 || wk===12){ s=Math.max(1,Math.round(s/2)); rir='3–4'; }
@@ -891,7 +891,7 @@ $('h-refresh').onclick=renderHistory;
 renderHero(); renderNums(); renderToday(); syncBadge(); flush();
 // Self-update: GitHub Pages caches the page for up to 10 minutes. On open and on return, fetch a fresh copy;
 // if its APP_V differs from this one, reload with a cache-busting query.
-const APP_V='2026-11-25.1';
+const APP_V='2026-11-27.1';
 function checkUpdate(){ fetch(location.pathname+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{ const m=t.match(/const APP_V='([^']+)'/); if(m&&m[1]!==APP_V){ const u=new URL(location.href); u.searchParams.set('v',m[1]); location.replace(u.toString()); } }).catch(()=>{}); }
 checkUpdate();
 // Pull down at the very top of the page to reload (works in the home-screen app too).
