@@ -546,10 +546,10 @@ const S = {
     {id:'rpd',n:'Reverse pec deck',sn:'Rear delt',s:2,r:[12,20],rir:'0–1',t:'iso'},
     {id:'inccurl',n:'Incline DB curl',s:3,r:[10,15],rir:'1',t:'arm',inc:{7:1}}
   ]},
-  hyroxA:{ name:'Heavy Sleds', tag:'HYROX template A, odd weeks, 35–45 min of work', stop:'The session ends on the written volume. A sled set more than 5 s slower than the first ends the sleds.', knee:true, ex:[
-    {id:'spush',n:'Sled push',s:4,r:[20,20],unit:'m',rir:'—',t:'main',load:'220 kg',note:'Go heavier by feel. Gym loads are training numbers; the floor changes the real resistance.'},
-    {id:'spull',n:'Sled pull',s:3,r:[20,20],unit:'m',rir:'—',t:'main',load:'153–180 kg'},
-    {id:'ergwb',n:'1000 m erg and 25 wall balls at 9 kg',s:2,r:[1,1],unit:'rounds',rir:'—',t:'main',note:'SkiErg, rower, or 2 km BikeErg. 90 s rest.'}
+  hyroxA:{ name:'Heavy Sleds', tag:'HYROX template A, odd weeks, 45–55 min with warm-up', stop:'The session ends on the written volume. A sled set more than 5 s slower than the first ends the sleds.', knee:true, ex:[
+    {id:'spush',n:'Sled push',s:4,r:[20,20],unit:'m',rir:'—',t:'main',load:'220 kg',note:'Warm-up first: 10 min easy erg, then 2 lighter pushes. Rest 2:30 between sets. Go heavier by feel; the floor changes the real resistance.'},
+    {id:'spull',n:'Sled pull',s:3,r:[20,20],unit:'m',rir:'—',t:'main',load:'153–180 kg',note:'Start at 153; take 180 for sets 2–3 if set 1 moved well. Rest 2:00. Then 4 min before the rounds.'},
+    {id:'ergwb',n:'1000 m erg + 50 wall balls at 9 kg',s:2,r:[1,1],unit:'rounds',rir:'—',t:'main',note:'Erg = SkiErg or rower (BikeErg: 2 km). Erg at RPE 8, straight into wall balls as 25 + 25 with 20–30 s between. 3 min rest between rounds. Log erg time and both WB set times.'}
   ]},
   hyroxB:{ name:'Race Flow', tag:'HYROX template B, even weeks, 35–45 min of work', stop:'BBJ: anything in the knee on landing ends BBJ for the day; do 40 wall balls instead. Knee worse next morning: BBJ come out and return after two clean weeks, from 20 m.', knee:true, ex:[
     {id:'rf1',n:'750 m erg, sled push 2 × 12.5 m at 202 kg',s:1,r:[1,1],unit:'round',rir:'—',t:'main'},
@@ -891,7 +891,7 @@ $('h-refresh').onclick=renderHistory;
 renderHero(); renderNums(); renderToday(); syncBadge(); flush();
 // Self-update: GitHub Pages caches the page for up to 10 minutes. On open and on return, fetch a fresh copy;
 // if its APP_V differs from this one, reload with a cache-busting query.
-const APP_V='2026-11-27.1';
+const APP_V='2026-11-28.1';
 function checkUpdate(){ fetch(location.pathname+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{ const m=t.match(/const APP_V='([^']+)'/); if(m&&m[1]!==APP_V){ const u=new URL(location.href); u.searchParams.set('v',m[1]); location.replace(u.toString()); } }).catch(()=>{}); }
 checkUpdate();
 // Pull down at the very top of the page to reload (works in the home-screen app too).

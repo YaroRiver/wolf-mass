@@ -17,3 +17,4 @@ Philosophy: Strength + Hypertrophy First · HYROX Conditioning Second · Running
 - 2026-11-24: Muscle-up skill block added as the Upper B warm-up (Yaro's long-standing goal). Low fatigue, skill only; strength is already sufficient (+20 kg × 6 pull-ups).
 - 2026-11-24: Upper A low-to-high cable fly → incline DB fly 30° (Yaro dislikes the cable version; neither has direct hypertrophy evidence for upper chest, so preference and stretch decide). Landmine press allowed as a swap.
 - 2026-11-27: Entry shortened to W1 only. W1 data: 4/4 sessions, knee 0–1/10, sleeping HR 57→54, Yaro reports the load as light. W2 runs full sets at written RIR; legs stay 2 RIR (knee + Saturday sled), biceps 2–3 through W2.
+- 2026-11-28: HYROX A rounds raised to 1000 m erg + 50 wall balls (25/25) ×2 = 100 WB, at Yaro's request; race withdrawn, WB capacity proven. Guard: legs heavy Monday morning → trim leg press, keep BSS and lunges.
