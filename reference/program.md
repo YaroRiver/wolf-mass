@@ -54,7 +54,7 @@ Weekly direct sets from W3: back 13 · chest 13 (6 upper, 6 mid, 1 dips) · quad
 ### HYROX A — Heavy Sleds (odd weeks)
 1. Sled push 4 × 20 m @ 220 kg (higher by feel) · stop sleds if a set is > 5 s slower than set 1
 2. Sled pull 3 × 20 m @ 153–180 kg
-3. 2 rounds: 1000 m erg + 25 Wall Balls @ 9 kg · 90 s rest
+3. 2 rounds: 1000 m erg (RPE 8) + 50 Wall Balls @ 9 kg as 25 + 25 (20–30 s break) · 3 min between rounds
 
 ### HYROX B — Race Flow (even weeks)
 4 rounds: 750 m erg + station — sled push 2 × 12.5 m @ 202 kg / BBJ 40 m / farmers 200 m @ 2 × 32 kg / 40 Wall Balls. Round-4 erg within ±3 s of round 1.
