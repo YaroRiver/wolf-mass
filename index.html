@@ -734,7 +734,7 @@ function saveSession(key,sid){
   const log=getLog(), sets={};
   document.querySelectorAll('#t-body input[data-ex]').forEach(inp=>{ const e=inp.dataset.ex,i=+inp.dataset.i,f=inp.dataset.f; sets[e]=sets[e]||[]; sets[e][i]=sets[e][i]||{}; if(inp.value!==''){ const v=inp.value.trim().replace(',','.'); sets[e][i][f]=(f==='t'||isNaN(+v))?v:+v; } });
   log[key]={session:sid,week:weekOf(parse(key)),sets,notes:$('t-notes').value,saved:new Date().toISOString()};
-  store.set(K.log,log); { const all=store.get('wm.draft.v1',{})||{}; delete all[key]; store.set('wm.draft.v1',all); } push('session',Object.assign({date:key,names:allEx()},log[key])); toast('Session saved'); renderNums(); renderToday();
+  store.set(K.log,log); { const all=store.get('wm.draft.v1',{})||{}; delete all[key]; store.set('wm.draft.v1',all); } push('session',Object.assign({date:key,names:allEx()},log[key],{sets:forSheet(log[key].sets)})); toast('Session saved'); renderNums(); renderToday();
 }
 
 /* plan */
@@ -822,7 +822,11 @@ function renderFuel(){ const wk=weekOf(new Date());
 /* data */
 const exportText=()=>JSON.stringify({exported:new Date().toISOString(),log:getLog(),body:getBody(),engine:store.get(K.eng,[])},null,2);
 function dl(name,text,type){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
-function allEx(){ const m={}; Object.values(S).forEach(s=>s.ex.forEach(e=>{ if(e.rir!=='—') m[e.id]=e.n; })); return m; }
+function allEx(){ const m={}; Object.values(S).forEach(s=>s.ex.forEach(e=>{ m[e.id]=e.n; })); return m; }
+// The Sheet has kg / reps / text columns. Extra fields (sled time, erg and wall-ball times) travel in the text column.
+function forSheet(sets){ const lab={tm:'s',e1:'R1 erg',a1:'R1 WB1',b1:'R1 WB2',e2:'R2 erg',a2:'R2 WB1',b2:'R2 WB2'}; const out={};
+  Object.keys(sets||{}).forEach(id=>{ out[id]=(sets[id]||[]).map(x=>{ if(!x) return x; const y={w:x.w,r:x.r,t:x.t}; const extra=Object.keys(x).filter(k=>!['w','r','t'].includes(k)&&x[k]!=null&&x[k]!=='');
+    if(extra.length){ const txt=extra.map(k=>k==='tm'?`${x[k]} s`:`${lab[k]||k} ${x[k]}`).join(' · '); y.t=y.t?y.t+' · '+txt:txt; if(x.tm!=null&&y.r==null) y.r=20; } return y; }); }); return out; }
 function importText(t){ try{ const j=JSON.parse(t); if(j.log) store.set(K.log,{...getLog(),...j.log}); if(j.body) store.set(K.body,{...getBody(),...j.body}); if(j.engine) store.set(K.eng,j.engine); toast('Data imported'); renderData(); renderNums(); }catch(e){ toast('That is not a valid export'); } }
 function renderData(){ const log=getLog(), b=getBody(), e=store.get(K.eng,[]);
   $('d-sum').textContent=`${Object.keys(log).length} sessions, ${Object.keys(b).length} check-ins and ${e.length} interval logs on this device.`;
@@ -896,13 +900,13 @@ $('b-date').value=iso(new Date()); $('e-date').value=iso(new Date());
 if (weekOf(selDate)<1) selDate=new Date(START);
 $('s-url').value=cfg().url||''; $('s-key').value=cfg().key||'';
 $('s-save').onclick=async()=>{ store.set(KS.cfg,{url:$('s-url').value.trim(),key:$('s-key').value.trim()}); $('s-msg').textContent='Testing…'; try{ await getSheet(); $('s-msg').textContent='Connected. New saves now go to the Sheet.'; flush(); }catch(e){ $('s-msg').textContent='Not connected: '+e.message; } syncBadge(); };
-$('s-push').onclick=async()=>{ try{ await post({type:'bulk',data:{body:getBody(),log:Object.fromEntries(Object.entries(getLog()).map(([d,l])=>[d,Object.assign({names:allEx()},l)])),engine:store.get(K.eng,[])}}); $('s-msg').textContent='Everything on this device is now in the Sheet.'; }catch(e){ $('s-msg').textContent='Send failed: '+e.message; } };
+$('s-push').onclick=async()=>{ try{ await post({type:'bulk',data:{body:getBody(),log:Object.fromEntries(Object.entries(getLog()).map(([d,l])=>[d,Object.assign({names:allEx()},l,{sets:forSheet(l.sets)})])),engine:store.get(K.eng,[])}}); $('s-msg').textContent='Everything on this device is now in the Sheet.'; }catch(e){ $('s-msg').textContent='Send failed: '+e.message; } };
 $('s-pull').onclick=async()=>{ try{ const r=await pull(); $('s-msg').textContent=`Pulled ${r.n} new entries from the Sheet.`; renderNums(); renderData(); }catch(e){ $('s-msg').textContent='Pull failed: '+e.message; } };
 $('h-refresh').onclick=renderHistory;
 renderHero(); renderNums(); renderToday(); syncBadge(); flush();
 // Self-update: GitHub Pages caches the page for up to 10 minutes. On open and on return, fetch a fresh copy;
 // if its APP_V differs from this one, reload with a cache-busting query.
-const APP_V='2026-11-28.3';
+const APP_V='2026-11-28.4';
 function checkUpdate(){ fetch(location.pathname+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{ const m=t.match(/const APP_V='([^']+)'/); if(m&&m[1]!==APP_V){ const u=new URL(location.href); u.searchParams.set('v',m[1]); location.replace(u.toString()); } }).catch(()=>{}); }
 checkUpdate();
 // Pull down at the very top of the page to reload (works in the home-screen app too).
