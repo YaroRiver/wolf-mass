@@ -178,6 +178,7 @@ footer{margin-top:60px;color:var(--faint);font-size:13px}
 .ex.ss{border-left:3px solid var(--dust,#9aa);padding-left:12px}.ss-label{font-size:13px;letter-spacing:.02em;opacity:.75;margin-bottom:6px}.ex.ss .ex-top+.ex-top{margin-top:10px}.set .i.tag{width:auto;min-width:72px;white-space:nowrap}
 .rest{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:40;display:none;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-radius:16px;background:#2a3431;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.45)}.rest.on{display:flex}.rest b{font:700 34px var(--display,inherit);margin-right:10px;font-variant-numeric:tabular-nums}.rest span{color:var(--dust);font-size:14px}.rest .row{display:flex;gap:6px}.rest .btn{padding:8px 12px}.rest.go{background:#3e9a62;border-color:#3e9a62}.rest.go b{color:#fff}
 .set.f2,.set.f3{display:grid;grid-template-columns:auto repeat(var(--n),1fr);gap:8px;align-items:center}.set.f2{--n:2}.set.f3{--n:3}.set.f3 input,.set.f2 input{min-width:0}
+.set.step{display:grid;grid-template-columns:1fr 120px;gap:10px;align-items:center}.set.step .i.tag{white-space:normal}
 .rep-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid rgba(255,255,255,.08);font-size:15px}.rep-row span:last-child{text-align:right}details.edit>summary{list-style:none;display:inline-block;cursor:pointer}details.edit>summary::-webkit-details-marker{display:none}
 .sync{display:inline-block;margin-left:10px;font-size:13px;padding:2px 9px;border-radius:999px;background:var(--slate-3);color:var(--dust)}
 .sync.ok{background:rgba(62,154,98,.18);color:#7fcf9c}.sync.wait{background:rgba(226,178,58,.18);color:#e8c66a}.sync.off{display:none}
@@ -551,7 +552,8 @@ const S = {
     {id:'spwu',n:'Sled push warm-up',s:2,r:[20,20],unit:'m',rir:'—',t:'main',load:'150 kg, then 200 kg',fields:[['w','kg'],['tm','sec']],note:'After 7 min easy erg. Easy pushes, find your footing.'},
     {id:'spush',n:'Sled push',s:4,r:[20,20],unit:'m',rir:'—',t:'main',load:'200–220 kg',fields:[['w','kg'],['tm','sec']],note:'Set 1 at 200. Clean and fast → 220 for sets 2–4. Write the time of each 20 m. A set 5 s slower than set 1 ends the sleds.'},
     {id:'spull',n:'Sled pull',s:3,r:[20,20],unit:'m',rir:'—',t:'main',load:'153–180 kg',fields:[['w','kg'],['tm','sec']],note:'Set 1 at 153; 180 for sets 2–3 if set 1 moved well. 4 min after the last set before the rounds.'},
-    {id:'ergwb',n:'1000 m erg + 50 wall balls',s:2,r:[1,1],unit:'round',rir:'—',t:'main',fields:[['erg','erg m:ss'],['wb1','WB 25 s'],['wb2','WB 25 s']],note:'SkiErg or rower (BikeErg: 2 km) at RPE 8, straight into 25 wall balls @ 9 kg, 20–30 s, 25 more. 3 min between rounds.'}
+    {id:'ergwb',n:'2 rounds: erg + wall balls',s:1,r:[1,1],unit:'',rir:'—',t:'main',note:'Erg = SkiErg or rower, 1000 m at a hard, steady pace (BikeErg: 2 km). Wall balls 9 kg. Do the rows top to bottom; each time you write a row, the timer shows the rest before the next one.',
+      steps:[['e1','Round 1 · Erg 1000 m','time m:ss',10],['a1','Round 1 · 25 wall balls','seconds',25],['b1','Round 1 · 25 wall balls','seconds',180],['e2','Round 2 · Erg 1000 m','time m:ss',10],['a2','Round 2 · 25 wall balls','seconds',25],['b2','Round 2 · 25 wall balls','seconds',0]]}
   ]},
   hyroxB:{ name:'Race Flow', tag:'HYROX template B, even weeks, 35–45 min of work', stop:'BBJ: anything in the knee on landing ends BBJ for the day; do 40 wall balls instead. Knee worse next morning: BBJ come out and return after two clean weeks, from 20 m.', knee:true, ex:[
     {id:'rf1',n:'750 m erg, sled push 2 × 12.5 m at 202 kg',s:1,r:[1,1],unit:'round',rir:'—',t:'main'},
@@ -675,20 +677,22 @@ function renderToday(){
       ? `<div class="callout"><strong>BikeErg</strong>${wk===2?'One test today: 4 × 4 min at RPE 8. Log the watts in Engine; they become your baseline.':'Week 1 is the arm and delt block only, and it is optional.'}</div>`
       : `<div class="callout ${g.off?'warn':'good'}"><strong>BikeErg intervals: ${g.off?'off today':'on'}</strong>${wk>=7?(wk%2?'5 × 4 min, 3 min easy between.':'3 series of 13 × 30 s on, 15 s off, 3 min between series.'):'4 × 4 min at RPE 8, 3 min easy between, one watt target for all four.'} Warm up for 10 minutes with three 10-second pickups.</div>`;
   }
-  const rowDone=(e,x)=>x&&(e.fields?x[e.fields[e.fields.length-1][0]]!=null:(x.w!=null&&x.r!=null));
+  const rowDone=(e,x)=>x&&(e.steps?false:e.fields?x[e.fields[e.fields.length-1][0]]!=null:(x.w!=null&&x.r!=null));
   const tracked=s.ex.filter(e=>e.rir!=='—'||e.fields);
   const filled=tracked.reduce((n,e)=>n+(saved[e.id]||[]).filter(x=>rowDone(e,x)).length,0);
-  const planned=tracked.reduce((n,e)=>n+prescribe(e,wk).s,0);
-  const done=!!(log[key]&&filled); const complete=done&&planned>0&&filled>=planned; if(done) h += reportCard(key,s,wk,log[key]);
+  const stepsDone=s.ex.filter(e=>e.steps).reduce((n,e)=>n+e.steps.filter(([f])=>(saved[e.id]||[])[0]&&saved[e.id][0][f]!=null).length,0);
+  const planned=tracked.filter(e=>!e.steps).reduce((n,e)=>n+prescribe(e,wk).s,0)+s.ex.filter(e=>e.steps).reduce((n,e)=>n+e.steps.length,0);
+  const done=!!(log[key]&&(filled+stepsDone)); const complete=done&&planned>0&&filled+stepsDone>=planned; if(done) h += reportCard(key,s,wk,log[key]);
   let form=''; const partners=new Set(s.ex.filter(e=>e.ss).map(e=>e.ss));
   const build=(ex,tag)=>{
     const p=prescribe(ex,wk), hn=hint(ex,p,key), unit=ex.unit||'';
     const rng=p.r[0]===p.r[1]?p.r[0]:`${p.r[0]}–${p.r[1]}`, sv=saved[ex.id]||[];
     let sets='';
-    if (ex.fields) for (let i=0;i<p.s;i++){ const v=sv[i]||{}; sets+=`<div class="set f${ex.fields.length}"><span class="i${tag?' tag':''}">${tag?tag+' ':''}${i+1}</span>${ex.fields.map(([f,ph],k)=>`<input type="text" inputmode="decimal" placeholder="${ph}" aria-label="${ex.n} ${i+1} ${ph}" data-ex="${ex.id}" data-i="${i}" data-f="${f}"${k===ex.fields.length-1?' data-last="1"':''} value="${dv(ex.id,i,f,v[f])}">`).join('')}</div>`; }
+    if (ex.steps){ const v=sv[0]||{}; ex.steps.forEach(([f,lab,ph,rest])=>{ sets+=`<div class="set step" data-rest="${rest}"><span class="i tag">${lab}</span><input type="text" inputmode="decimal" placeholder="${ph}" aria-label="${lab}" data-ex="${ex.id}" data-i="0" data-f="${f}" data-last="1" value="${dv(ex.id,0,f,v[f])}"></div>`; }); }
+    else if (ex.fields) for (let i=0;i<p.s;i++){ const v=sv[i]||{}; sets+=`<div class="set f${ex.fields.length}"><span class="i${tag?' tag':''}">${tag?tag+' ':''}${i+1}</span>${ex.fields.map(([f,ph],k)=>`<input type="text" inputmode="decimal" placeholder="${ph}" aria-label="${ex.n} ${i+1} ${ph}" data-ex="${ex.id}" data-i="${i}" data-f="${f}"${k===ex.fields.length-1?' data-last="1"':''} value="${dv(ex.id,i,f,v[f])}">`).join('')}</div>`; }
     else if (ex.rir!=='—') for (let i=0;i<p.s;i++){ const v=sv[i]||{}; sets+=`<div class="set"><span class="i${tag?' tag':''}">${tag?tag+' ':''}${i+1}</span><input type="number" step="0.5" inputmode="decimal" placeholder="kg" aria-label="${ex.n} set ${i+1} kg" data-ex="${ex.id}" data-i="${i}" data-f="w" value="${dv(ex.id,i,'w',v.w)}"><span class="x">×</span><input type="number" inputmode="numeric" placeholder="${unit==='m'?'m':'reps'}" aria-label="${ex.n} set ${i+1} reps" data-ex="${ex.id}" data-i="${i}" data-f="r" value="${dv(ex.id,i,'r',v.r)}"></div>`; }
     else sets=`<div class="set wide"><input type="text" placeholder="Times and notes" aria-label="${ex.n} result" data-ex="${ex.id}" data-i="0" data-f="t" value="${dv(ex.id,0,'t',(sv[0]||{}).t)}"></div>`;
-    return {sets, rows:sets.split('</div><div class="set').map((x,i,a)=>(i?'<div class="set':'')+x+(i<a.length-1?'</div>':'')), head:`<div class="ex-top"><div class="ex-n">${ex.n}</div><div class="ex-rx">${p.s} × ${rng}${unit?` ${unit}`:''}<small>${ex.fields?'':'RIR '+p.rir}${ex.rir!=='—'||ex.fields?(ex.fields?'':' · ')+'rest '+fmtRest(restFor(ex,S[sidNow])):''}</small></div>${(ex.load||p.note)?`<div class="ex-note">${ex.load?`<b style="color:var(--chalk)">${ex.load}.</b> `:''}${p.note}</div>`:''}${ex.rir!=='—'&&!ex.fields?`<div class="ex-hint ${hn.cls}">${hn.txt}</div>`:''}</div>`};
+    return {sets, rows:sets.split('</div><div class="set').map((x,i,a)=>(i?'<div class="set':'')+x+(i<a.length-1?'</div>':'')), head:`<div class="ex-top"><div class="ex-n">${ex.n}</div><div class="ex-rx">${ex.steps?ex.steps.length+' steps':`${p.s} × ${rng}${unit?` ${unit}`:''}`}<small>${ex.fields||ex.steps?'':'RIR '+p.rir}${ex.steps?'':ex.rir!=='—'||ex.fields?(ex.fields?'':' · ')+'rest '+fmtRest(restFor(ex,S[sidNow])):''}</small></div>${(ex.load||p.note)?`<div class="ex-note">${ex.load?`<b style="color:var(--chalk)">${ex.load}.</b> `:''}${p.note}</div>`:''}${ex.rir!=='—'&&!ex.fields?`<div class="ex-hint ${hn.cls}">${hn.txt}</div>`:''}</div>`};
   };
   s.ex.forEach(ex=>{
     if (partners.has(ex.id)) return;
@@ -704,7 +708,7 @@ function renderToday(){
   body.innerHTML=h;
   $('t-save').onclick=()=>saveSession(key,sid);
   body.onchange=e=>{ const t=e.target; if(!t.dataset||!(t.dataset.f==='r'||t.dataset.last)||t.value==='') return; const row=t.closest('.set'); if(!row||[...row.querySelectorAll('input')].some(x=>x.value==='')) return;
-    const ex=S[sid].ex.find(x=>x.id===t.dataset.ex); if(!ex) return;
+    const ex=S[sid].ex.find(x=>x.id===t.dataset.ex); if(!ex) return; if(row.dataset.rest!=null){ const rows=[...body.querySelectorAll('.set')], nx=rows[rows.indexOf(row)+1]; const lab=nx?nx.querySelector('.i').textContent.trim():''; const r=+row.dataset.rest; if(r) startRest(r,lab); return; }
     const rows=[...body.querySelectorAll('.set')], nx=rows[rows.indexOf(row)+1], nxEx=nx&&S[sid].ex.find(x=>x.id===nx.querySelector('[data-ex]')?.dataset.ex), lab=nx?nx.querySelector('.i').textContent.trim():'', next=nx?(/^\d+$/.test(lab)&&nxEx?`${nxEx.n}, set ${lab}`:lab):'';
     const nextEx=nx&&nx.querySelector('[data-ex]')?.dataset.ex; const n=nextEx&&nextEx!==ex.id&&nx.closest('.ex.ss')===row.closest('.ex.ss')&&row.closest('.ex.ss')?restInSuperset(ex,S[sid]):restFor(ex,S[sid]);
     startRest(n,next); };
@@ -715,7 +719,8 @@ function renderToday(){
 function reportCard(key,s,wk,L){
   const sets=L.sets||{}, wo=(store.get(K.wk,{})||{})[key];
   let planned=0, doneN=0, kg=0; const rows=[];
-  s.ex.forEach(ex=>{ if(ex.fields){ const sv=(sets[ex.id]||[]).filter(Boolean); const p=prescribe(ex,wk); planned+=p.s; const ok=sv.filter(x=>x[ex.fields[ex.fields.length-1][0]]!=null); doneN+=ok.length; if(ok.length) rows.push(`<div class="rep-row"><span>${ex.n}</span><span>${ok.map(x=>ex.fields.map(([f])=>x[f]??'–').join(' / ')).join(' · ')}</span></div>`); return; }
+  s.ex.forEach(ex=>{ if(ex.steps){ const v=(sets[ex.id]||[])[0]||{}; ex.steps.forEach(([f,lab])=>{ planned++; if(v[f]!=null){ doneN++; rows.push(`<div class="rep-row"><span>${lab}</span><span>${v[f]}</span></div>`); } }); return; }
+    if(ex.fields){ const sv=(sets[ex.id]||[]).filter(Boolean); const p=prescribe(ex,wk); planned+=p.s; const ok=sv.filter(x=>x[ex.fields[ex.fields.length-1][0]]!=null); doneN+=ok.length; if(ok.length) rows.push(`<div class="rep-row"><span>${ex.n}</span><span>${ok.map(x=>ex.fields.map(([f])=>x[f]??'–').join(' / ')).join(' · ')}</span></div>`); return; }
     if(ex.rir==='—') return; const p=prescribe(ex,wk), sv=(sets[ex.id]||[]).filter(x=>x&&x.w!=null&&x.r!=null); planned+=p.s; doneN+=sv.length; if(!sv.length) return;
     if((ex.unit||'')!=='m') sv.forEach(x=>kg+=x.w*x.r);
     const best=sv.reduce((a,x)=>x.w>a.w||(x.w===a.w&&x.r>a.r)?x:a,sv[0]);
@@ -897,7 +902,7 @@ $('h-refresh').onclick=renderHistory;
 renderHero(); renderNums(); renderToday(); syncBadge(); flush();
 // Self-update: GitHub Pages caches the page for up to 10 minutes. On open and on return, fetch a fresh copy;
 // if its APP_V differs from this one, reload with a cache-busting query.
-const APP_V='2026-11-28.2';
+const APP_V='2026-11-28.3';
 function checkUpdate(){ fetch(location.pathname+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{ const m=t.match(/const APP_V='([^']+)'/); if(m&&m[1]!==APP_V){ const u=new URL(location.href); u.searchParams.set('v',m[1]); location.replace(u.toString()); } }).catch(()=>{}); }
 checkUpdate();
 // Pull down at the very top of the page to reload (works in the home-screen app too).
