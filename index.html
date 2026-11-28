@@ -177,6 +177,7 @@ ul.rules li{padding:10px 0;border-top:1px solid var(--line);font-size:15.5px;max
 footer{margin-top:60px;color:var(--faint);font-size:13px}
 .ex.ss{border-left:3px solid var(--dust,#9aa);padding-left:12px}.ss-label{font-size:13px;letter-spacing:.02em;opacity:.75;margin-bottom:6px}.ex.ss .ex-top+.ex-top{margin-top:10px}.set .i.tag{width:auto;min-width:72px;white-space:nowrap}
 .rest{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:40;display:none;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-radius:16px;background:#2a3431;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.45)}.rest.on{display:flex}.rest b{font:700 34px var(--display,inherit);margin-right:10px;font-variant-numeric:tabular-nums}.rest span{color:var(--dust);font-size:14px}.rest .row{display:flex;gap:6px}.rest .btn{padding:8px 12px}.rest.go{background:#3e9a62;border-color:#3e9a62}.rest.go b{color:#fff}
+.set.f2,.set.f3{display:grid;grid-template-columns:auto repeat(var(--n),1fr);gap:8px;align-items:center}.set.f2{--n:2}.set.f3{--n:3}.set.f3 input,.set.f2 input{min-width:0}
 .rep-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid rgba(255,255,255,.08);font-size:15px}.rep-row span:last-child{text-align:right}details.edit>summary{list-style:none;display:inline-block;cursor:pointer}details.edit>summary::-webkit-details-marker{display:none}
 .sync{display:inline-block;margin-left:10px;font-size:13px;padding:2px 9px;border-radius:999px;background:var(--slate-3);color:var(--dust)}
 .sync.ok{background:rgba(62,154,98,.18);color:#7fcf9c}.sync.wait{background:rgba(226,178,58,.18);color:#e8c66a}.sync.off{display:none}
@@ -547,9 +548,10 @@ const S = {
     {id:'inccurl',n:'Incline DB curl',s:3,r:[10,15],rir:'1',t:'arm',inc:{7:1}}
   ]},
   hyroxA:{ name:'Heavy Sleds', tag:'HYROX template A, odd weeks, 45–55 min with warm-up', stop:'The session ends on the written volume. A sled set more than 5 s slower than the first ends the sleds.', knee:true, ex:[
-    {id:'spush',n:'Sled push',s:4,r:[20,20],unit:'m',rir:'—',t:'main',load:'220 kg',note:'Warm-up first: 10 min easy erg, then 2 lighter pushes. Rest 2:30 between sets. Go heavier by feel; the floor changes the real resistance.'},
-    {id:'spull',n:'Sled pull',s:3,r:[20,20],unit:'m',rir:'—',t:'main',load:'153–180 kg',note:'Start at 153; take 180 for sets 2–3 if set 1 moved well. Rest 2:00. Then 4 min before the rounds.'},
-    {id:'ergwb',n:'1000 m erg + 50 wall balls at 9 kg',s:2,r:[1,1],unit:'rounds',rir:'—',t:'main',note:'Erg = SkiErg or rower (BikeErg: 2 km). Erg at RPE 8, straight into wall balls as 25 + 25 with 20–30 s between. 3 min rest between rounds. Log erg time and both WB set times.'}
+    {id:'spwu',n:'Sled push warm-up',s:2,r:[20,20],unit:'m',rir:'—',t:'main',load:'150 kg, then 200 kg',fields:[['w','kg'],['tm','sec']],note:'After 7 min easy erg. Easy pushes, find your footing.'},
+    {id:'spush',n:'Sled push',s:4,r:[20,20],unit:'m',rir:'—',t:'main',load:'200–220 kg',fields:[['w','kg'],['tm','sec']],note:'Set 1 at 200. Clean and fast → 220 for sets 2–4. Write the time of each 20 m. A set 5 s slower than set 1 ends the sleds.'},
+    {id:'spull',n:'Sled pull',s:3,r:[20,20],unit:'m',rir:'—',t:'main',load:'153–180 kg',fields:[['w','kg'],['tm','sec']],note:'Set 1 at 153; 180 for sets 2–3 if set 1 moved well. 4 min after the last set before the rounds.'},
+    {id:'ergwb',n:'1000 m erg + 50 wall balls',s:2,r:[1,1],unit:'round',rir:'—',t:'main',fields:[['erg','erg m:ss'],['wb1','WB 25 s'],['wb2','WB 25 s']],note:'SkiErg or rower (BikeErg: 2 km) at RPE 8, straight into 25 wall balls @ 9 kg, 20–30 s, 25 more. 3 min between rounds.'}
   ]},
   hyroxB:{ name:'Race Flow', tag:'HYROX template B, even weeks, 35–45 min of work', stop:'BBJ: anything in the knee on landing ends BBJ for the day; do 40 wall balls instead. Knee worse next morning: BBJ come out and return after two clean weeks, from 20 m.', knee:true, ex:[
     {id:'rf1',n:'750 m erg, sled push 2 × 12.5 m at 202 kg',s:1,r:[1,1],unit:'round',rir:'—',t:'main'},
@@ -636,7 +638,7 @@ function renderNums(){
 let selDate = new Date();
 /* rest timer */
 let sidNow=null;
-const REST={pullup:150,bench:60,lpress:120,bss:120,lunge:120,sumo:120,incdb:120,dips:120,pulldn:90,oarow:90,csrow:90};
+const REST={spwu:90,spush:150,spull:120,ergwb:180,pullup:150,bench:60,lpress:120,bss:120,lunge:120,sumo:120,incdb:120,dips:120,pulldn:90,oarow:90,csrow:90};
 function restFor(ex,s){ if(REST[ex.id]!=null) return REST[ex.id]; if(s&&s.ex.some(e=>e.ss===ex.id)) return 90; return ex.t==='main'?120:75; }
 function restInSuperset(ex,s){ return ex.id==='bench'?60:15; } // A → B inside a superset: bench gets a real minute, arm pairs go straight on
 function fmtRest(n){ return n>=60?`${Math.floor(n/60)}:${String(n%60).padStart(2,'0')}`:`${n} s`; }
@@ -673,17 +675,20 @@ function renderToday(){
       ? `<div class="callout"><strong>BikeErg</strong>${wk===2?'One test today: 4 × 4 min at RPE 8. Log the watts in Engine; they become your baseline.':'Week 1 is the arm and delt block only, and it is optional.'}</div>`
       : `<div class="callout ${g.off?'warn':'good'}"><strong>BikeErg intervals: ${g.off?'off today':'on'}</strong>${wk>=7?(wk%2?'5 × 4 min, 3 min easy between.':'3 series of 13 × 30 s on, 15 s off, 3 min between series.'):'4 × 4 min at RPE 8, 3 min easy between, one watt target for all four.'} Warm up for 10 minutes with three 10-second pickups.</div>`;
   }
-  const filled=Object.values(saved).reduce((n,a)=>n+(a||[]).filter(x=>x&&x.w!=null&&x.r!=null).length,0);
-  const planned=s.ex.filter(e=>e.rir!=='—').reduce((n,e)=>n+prescribe(e,wk).s,0);
-  const done=!!(log[key]&&filled); const complete=done&&filled>=planned; if(done) h += reportCard(key,s,wk,log[key]);
+  const rowDone=(e,x)=>x&&(e.fields?x[e.fields[e.fields.length-1][0]]!=null:(x.w!=null&&x.r!=null));
+  const tracked=s.ex.filter(e=>e.rir!=='—'||e.fields);
+  const filled=tracked.reduce((n,e)=>n+(saved[e.id]||[]).filter(x=>rowDone(e,x)).length,0);
+  const planned=tracked.reduce((n,e)=>n+prescribe(e,wk).s,0);
+  const done=!!(log[key]&&filled); const complete=done&&planned>0&&filled>=planned; if(done) h += reportCard(key,s,wk,log[key]);
   let form=''; const partners=new Set(s.ex.filter(e=>e.ss).map(e=>e.ss));
   const build=(ex,tag)=>{
     const p=prescribe(ex,wk), hn=hint(ex,p,key), unit=ex.unit||'';
     const rng=p.r[0]===p.r[1]?p.r[0]:`${p.r[0]}–${p.r[1]}`, sv=saved[ex.id]||[];
     let sets='';
-    if (ex.rir!=='—') for (let i=0;i<p.s;i++){ const v=sv[i]||{}; sets+=`<div class="set"><span class="i${tag?' tag':''}">${tag?tag+' ':''}${i+1}</span><input type="number" step="0.5" inputmode="decimal" placeholder="kg" aria-label="${ex.n} set ${i+1} kg" data-ex="${ex.id}" data-i="${i}" data-f="w" value="${dv(ex.id,i,'w',v.w)}"><span class="x">×</span><input type="number" inputmode="numeric" placeholder="${unit==='m'?'m':'reps'}" aria-label="${ex.n} set ${i+1} reps" data-ex="${ex.id}" data-i="${i}" data-f="r" value="${dv(ex.id,i,'r',v.r)}"></div>`; }
+    if (ex.fields) for (let i=0;i<p.s;i++){ const v=sv[i]||{}; sets+=`<div class="set f${ex.fields.length}"><span class="i${tag?' tag':''}">${tag?tag+' ':''}${i+1}</span>${ex.fields.map(([f,ph],k)=>`<input type="text" inputmode="decimal" placeholder="${ph}" aria-label="${ex.n} ${i+1} ${ph}" data-ex="${ex.id}" data-i="${i}" data-f="${f}"${k===ex.fields.length-1?' data-last="1"':''} value="${dv(ex.id,i,f,v[f])}">`).join('')}</div>`; }
+    else if (ex.rir!=='—') for (let i=0;i<p.s;i++){ const v=sv[i]||{}; sets+=`<div class="set"><span class="i${tag?' tag':''}">${tag?tag+' ':''}${i+1}</span><input type="number" step="0.5" inputmode="decimal" placeholder="kg" aria-label="${ex.n} set ${i+1} kg" data-ex="${ex.id}" data-i="${i}" data-f="w" value="${dv(ex.id,i,'w',v.w)}"><span class="x">×</span><input type="number" inputmode="numeric" placeholder="${unit==='m'?'m':'reps'}" aria-label="${ex.n} set ${i+1} reps" data-ex="${ex.id}" data-i="${i}" data-f="r" value="${dv(ex.id,i,'r',v.r)}"></div>`; }
     else sets=`<div class="set wide"><input type="text" placeholder="Times and notes" aria-label="${ex.n} result" data-ex="${ex.id}" data-i="0" data-f="t" value="${dv(ex.id,0,'t',(sv[0]||{}).t)}"></div>`;
-    return {sets, rows:sets.split('</div><div class="set').map((x,i,a)=>(i?'<div class="set':'')+x+(i<a.length-1?'</div>':'')), head:`<div class="ex-top"><div class="ex-n">${ex.n}</div><div class="ex-rx">${p.s} × ${rng}${unit?` ${unit}`:''}<small>RIR ${p.rir}${ex.rir!=='—'?' · rest '+fmtRest(restFor(ex,S[sidNow])):''}</small></div>${(ex.load||p.note)?`<div class="ex-note">${ex.load?`<b style="color:var(--chalk)">${ex.load}.</b> `:''}${p.note}</div>`:''}${ex.rir!=='—'?`<div class="ex-hint ${hn.cls}">${hn.txt}</div>`:''}</div>`};
+    return {sets, rows:sets.split('</div><div class="set').map((x,i,a)=>(i?'<div class="set':'')+x+(i<a.length-1?'</div>':'')), head:`<div class="ex-top"><div class="ex-n">${ex.n}</div><div class="ex-rx">${p.s} × ${rng}${unit?` ${unit}`:''}<small>${ex.fields?'':'RIR '+p.rir}${ex.rir!=='—'||ex.fields?(ex.fields?'':' · ')+'rest '+fmtRest(restFor(ex,S[sidNow])):''}</small></div>${(ex.load||p.note)?`<div class="ex-note">${ex.load?`<b style="color:var(--chalk)">${ex.load}.</b> `:''}${p.note}</div>`:''}${ex.rir!=='—'&&!ex.fields?`<div class="ex-hint ${hn.cls}">${hn.txt}</div>`:''}</div>`};
   };
   s.ex.forEach(ex=>{
     if (partners.has(ex.id)) return;
@@ -698,7 +703,7 @@ function renderToday(){
   h += complete ? `<details class="edit"><summary class="btn ghost" style="margin-top:14px">Edit the sets</summary>${form}</details>` : form;
   body.innerHTML=h;
   $('t-save').onclick=()=>saveSession(key,sid);
-  body.onchange=e=>{ const t=e.target; if(!t.dataset||t.dataset.f!=='r'||t.value==='') return; const row=t.closest('.set'), w=row&&row.querySelector('[data-f=w]'); if(w&&w.value==='') return;
+  body.onchange=e=>{ const t=e.target; if(!t.dataset||!(t.dataset.f==='r'||t.dataset.last)||t.value==='') return; const row=t.closest('.set'); if(!row||[...row.querySelectorAll('input')].some(x=>x.value==='')) return;
     const ex=S[sid].ex.find(x=>x.id===t.dataset.ex); if(!ex) return;
     const rows=[...body.querySelectorAll('.set')], nx=rows[rows.indexOf(row)+1], nxEx=nx&&S[sid].ex.find(x=>x.id===nx.querySelector('[data-ex]')?.dataset.ex), lab=nx?nx.querySelector('.i').textContent.trim():'', next=nx?(/^\d+$/.test(lab)&&nxEx?`${nxEx.n}, set ${lab}`:lab):'';
     const nextEx=nx&&nx.querySelector('[data-ex]')?.dataset.ex; const n=nextEx&&nextEx!==ex.id&&nx.closest('.ex.ss')===row.closest('.ex.ss')&&row.closest('.ex.ss')?restInSuperset(ex,S[sid]):restFor(ex,S[sid]);
@@ -710,18 +715,19 @@ function renderToday(){
 function reportCard(key,s,wk,L){
   const sets=L.sets||{}, wo=(store.get(K.wk,{})||{})[key];
   let planned=0, doneN=0, kg=0; const rows=[];
-  s.ex.forEach(ex=>{ if(ex.rir==='—') return; const p=prescribe(ex,wk), sv=(sets[ex.id]||[]).filter(x=>x&&x.w!=null&&x.r!=null); planned+=p.s; doneN+=sv.length; if(!sv.length) return;
+  s.ex.forEach(ex=>{ if(ex.fields){ const sv=(sets[ex.id]||[]).filter(Boolean); const p=prescribe(ex,wk); planned+=p.s; const ok=sv.filter(x=>x[ex.fields[ex.fields.length-1][0]]!=null); doneN+=ok.length; if(ok.length) rows.push(`<div class="rep-row"><span>${ex.n}</span><span>${ok.map(x=>ex.fields.map(([f])=>x[f]??'–').join(' / ')).join(' · ')}</span></div>`); return; }
+    if(ex.rir==='—') return; const p=prescribe(ex,wk), sv=(sets[ex.id]||[]).filter(x=>x&&x.w!=null&&x.r!=null); planned+=p.s; doneN+=sv.length; if(!sv.length) return;
     if((ex.unit||'')!=='m') sv.forEach(x=>kg+=x.w*x.r);
     const best=sv.reduce((a,x)=>x.w>a.w||(x.w===a.w&&x.r>a.r)?x:a,sv[0]);
     const top=p.r[0]!==p.r[1]&&sv.length>=p.s&&sv.every(x=>x.r>=p.r[1]);
     rows.push(`<div class="rep-row"><span>${ex.n}</span><span>${sv.length} × ${best.w} kg × ${best.r}${ex.unit==='m'?' m':''}${top?' · <b style="color:#7fcf9c">'+(wk<=2?'top of range':'top of range: add load next time')+'</b>':''}</span></div>`); });
   const t=L.saved?new Date(L.saved).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}):'';
   const watch=wo?`<div class="hist-grid" style="margin:10px 0">${[[wo.min!=null?Math.round(wo.min):null,'min'],[wo.avg,'avg HR'],[wo.max,'max HR'],[wo.kcal,'active kcal']].map(([v,u])=>`<div><b>${v??'—'}</b><span>${u}</span></div>`).join('')}</div>`:`<p class="small" style="margin:8px 0">Watch numbers appear here after you send Claude the workout screenshot.</p>`;
-  return `<div class="callout good"><strong>Session saved${t?' at '+t:''}</strong><div style="margin:6px 0 2px">${doneN} of ${planned} planned sets · ${Math.round(kg).toLocaleString('en-AU')} kg moved (lunges counted separately)</div>${watch}<div class="rep">${rows.join('')}</div>${L.notes?`<p class="small" style="margin-top:8px">Notes: ${L.notes.replace(/</g,'&lt;')}</p>`:''}</div>`;
+  return `<div class="callout good"><strong>Session saved${t?' at '+t:''}</strong><div style="margin:6px 0 2px">${doneN} of ${planned} planned sets${kg?` · ${Math.round(kg).toLocaleString('en-AU')} kg moved`:''}</div>${watch}<div class="rep">${rows.join('')}</div>${L.notes?`<p class="small" style="margin-top:8px">Notes: ${L.notes.replace(/</g,'&lt;')}</p>`:''}</div>`;
 }
 function saveSession(key,sid){
   const log=getLog(), sets={};
-  document.querySelectorAll('#t-body input[data-ex]').forEach(inp=>{ const e=inp.dataset.ex,i=+inp.dataset.i,f=inp.dataset.f; sets[e]=sets[e]||[]; sets[e][i]=sets[e][i]||{}; if(inp.value!=='') sets[e][i][f]=f==='t'?inp.value:+inp.value; });
+  document.querySelectorAll('#t-body input[data-ex]').forEach(inp=>{ const e=inp.dataset.ex,i=+inp.dataset.i,f=inp.dataset.f; sets[e]=sets[e]||[]; sets[e][i]=sets[e][i]||{}; if(inp.value!==''){ const v=inp.value.trim().replace(',','.'); sets[e][i][f]=(f==='t'||isNaN(+v))?v:+v; } });
   log[key]={session:sid,week:weekOf(parse(key)),sets,notes:$('t-notes').value,saved:new Date().toISOString()};
   store.set(K.log,log); { const all=store.get('wm.draft.v1',{})||{}; delete all[key]; store.set('wm.draft.v1',all); } push('session',Object.assign({date:key,names:allEx()},log[key])); toast('Session saved'); renderNums(); renderToday();
 }
@@ -891,7 +897,7 @@ $('h-refresh').onclick=renderHistory;
 renderHero(); renderNums(); renderToday(); syncBadge(); flush();
 // Self-update: GitHub Pages caches the page for up to 10 minutes. On open and on return, fetch a fresh copy;
 // if its APP_V differs from this one, reload with a cache-busting query.
-const APP_V='2026-11-28.1';
+const APP_V='2026-11-28.2';
 function checkUpdate(){ fetch(location.pathname+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{ const m=t.match(/const APP_V='([^']+)'/); if(m&&m[1]!==APP_V){ const u=new URL(location.href); u.searchParams.set('v',m[1]); location.replace(u.toString()); } }).catch(()=>{}); }
 checkUpdate();
 // Pull down at the very top of the page to reload (works in the home-screen app too).
